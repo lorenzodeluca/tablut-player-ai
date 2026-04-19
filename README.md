@@ -1,0 +1,3 @@
+La nostra filosofix di base è "non reinventare la ruota"...
+
+In questo progetto abbiamo usato le implementazioni standard del AIMA per iterative deepening/min max/alpha beta e ci siamo concentrati su una nostra implementazione per l'euristica
