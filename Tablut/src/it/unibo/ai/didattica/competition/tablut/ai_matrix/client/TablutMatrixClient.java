@@ -6,12 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import it.unibo.ai.didattica.competition.tablut.ai_matrix.MatrixGameForDeepeningAlphaBetaSearch;
 import it.unibo.ai.didattica.competition.tablut.client.TablutClient;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.Game;
-import it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut;
-import it.unibo.ai.didattica.competition.tablut.domain.GameModernTablut;
-import it.unibo.ai.didattica.competition.tablut.domain.GameTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 import it.unibo.ai.didattica.competition.tablut.domain.StateBrandub;
@@ -69,7 +67,7 @@ public class TablutMatrixClient extends TablutClient{
 		Game rules = null;
         state = new StateTablut();
         state.setTurn(State.Turn.WHITE);
-        rules = new GameAshtonTablut(0, -1, "logs", "white_matrix", "black_matrix");
+        rules = new MatrixGameForDeepeningAlphaBetaSearch(state, 0, -1, "logs", "white_matrix", "black_matrix");
         System.out.println("Ashton Tablut game - matrix client");
 
 		List<int[]> pawns = new ArrayList<int[]>();

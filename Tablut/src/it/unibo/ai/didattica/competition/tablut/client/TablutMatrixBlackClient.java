@@ -1,4 +1,4 @@
-package it.unibo.ai.didattica.competition.tablut.matrix;
+package it.unibo.ai.didattica.competition.tablut.client;
 
 public class TablutMatrixBlackClient {
     
