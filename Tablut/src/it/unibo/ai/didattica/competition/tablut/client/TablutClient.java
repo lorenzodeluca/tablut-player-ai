@@ -1,3 +1,4 @@
+
 package it.unibo.ai.didattica.competition.tablut.client;
 
 import java.io.DataInputStream;
