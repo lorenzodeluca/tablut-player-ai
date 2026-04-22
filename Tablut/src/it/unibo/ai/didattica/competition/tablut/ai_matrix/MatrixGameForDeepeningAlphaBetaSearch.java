@@ -3,11 +3,18 @@ package it.unibo.ai.didattica.competition.tablut.ai_matrix;
 import java.util.Arrays;
 import java.util.List;
 
+import it.unibo.ai.didattica.competition.tablut.ai_matrix.heuristics.BlackHeuristics;
+import it.unibo.ai.didattica.competition.tablut.ai_matrix.heuristics.WhiteHeuristics;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
-
+/**
+ * Classe che aggiunge alla classe base 'GameAshtonTablut' con le meccaniche del gioco
+ * l'implementazione dei metodi della classe  aima.core.search.adversarial.Game
+ * in modo da poter usare l'implementazione della DeepeningAlphaBetaSearch
+ * della libreria aima.
+ */
 public class MatrixGameForDeepeningAlphaBetaSearch extends GameAshtonTablut implements aima.core.search.adversarial.Game<State, Action, State.Turn> {
 
     public MatrixGameForDeepeningAlphaBetaSearch(State state, int repeated_moves_allowed, int cache_size,
@@ -15,6 +22,12 @@ public class MatrixGameForDeepeningAlphaBetaSearch extends GameAshtonTablut impl
         super(state, repeated_moves_allowed, cache_size, logs_folder, whiteName, blackName);
     }
 
+    /**
+     * descrizione di esempio
+     * 
+     * @param arg0 spiegazione del parametro
+     * @return ritorna una lista con le possibili mosse
+     */
     @Override
     public List<Action> getActions(State arg0) {
         // TODO Auto-generated method stub
@@ -29,7 +42,7 @@ public class MatrixGameForDeepeningAlphaBetaSearch extends GameAshtonTablut impl
 
     
     @Override
-    public Turn getPlayer(State state) { //the next player to play
+    public Turn getPlayer(State state) { //il prossimo giocatore a fare la mossa
         return state.getTurn();
     }
 
@@ -44,30 +57,30 @@ public class MatrixGameForDeepeningAlphaBetaSearch extends GameAshtonTablut impl
         throw new UnsupportedOperationException("Unimplemented method 'getResult'");
     }
 
-    //method that uses heuristics
+    //metodi che usano l'euristicas
     @Override
     public double getUtility(State state, Turn turn) {
         if ((turn.equals(State.Turn.WHITE) && state.getTurn().equals(State.Turn.WHITEWIN)) || (turn.equals(State.Turn.BLACK) && state.getTurn().equals(State.Turn.BLACKWIN)) ){
-            //win
+            //vittoria
             return Double.POSITIVE_INFINITY;
         } 
 		else if ((turn.equals(State.Turn.WHITE) && state.getTurn().equals(State.Turn.BLACKWIN)) || (turn.equals(State.Turn.BLACK) && state.getTurn().equals(State.Turn.WHITEWIN)) ) {
-            //game lost
+            //sconfitta
             return Double.NEGATIVE_INFINITY;
         }
 
 
-			// if it isn't a terminal state
+			// se non è uno stato finale 
 			Heuristics heuristics = null;
 			if (turn.equals(State.Turn.WHITE)) {
-				heuristics = new WhiteMoonHeuristics(state);
+				heuristics = new WhiteHeuristics(state);
 			} else {
-				heuristics = new BlackHoleHeuristics(state);
+				heuristics = new BlackHeuristics(state);
 			}
 			return  heuristics.evaluateState();
     }
 
-    //check if the state is terminal(it means the game end)
+    //controlla se lo stato è uno stato finale(d)
     @Override
     public boolean isTerminal(State arg0) {
         // TODO Auto-generated method stub
