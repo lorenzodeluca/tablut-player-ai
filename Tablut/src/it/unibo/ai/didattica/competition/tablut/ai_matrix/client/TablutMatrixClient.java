@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import it.unibo.ai.didattica.competition.tablut.ai_matrix.MatrixConfigs;
 import it.unibo.ai.didattica.competition.tablut.ai_matrix.MatrixIterativeDeepeningAlphaBetaSearch;
 import it.unibo.ai.didattica.competition.tablut.client.TablutClient;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
@@ -20,7 +21,7 @@ public class TablutMatrixClient extends TablutClient{
     private static String role = "";
     private static String name = "Matrix";
     private static String ipAddress = "localhost";
-    private static int timeout = 60;
+    private static int timeout = 55;
 
 	public TablutMatrixClient(String player, String name, int timeout, String ipAddress) throws UnknownHostException, IOException {
 		super(player, name, timeout, ipAddress);
@@ -31,7 +32,7 @@ public class TablutMatrixClient extends TablutClient{
 	}
 
 	public TablutMatrixClient(String player) throws UnknownHostException, IOException {
-		this(player, "Matrix", 60, "localhost");
+		this(player, "Matrix", 55, "localhost");
 	}
 
 
@@ -89,13 +90,16 @@ public class TablutMatrixClient extends TablutClient{
 
 			if (this.getPlayer().equals(Turn.WHITE)) { //se il giocatore è bianco  
 				if (this.getCurrentState().getTurn().equals(StateTablut.Turn.WHITE)) { //if its white turn
-                    System.out.println("my turn(white)...");
-                    
-					MatrixIterativeDeepeningAlphaBetaSearch search = new MatrixIterativeDeepeningAlphaBetaSearch(game, Double.MIN_VALUE, Double.MAX_VALUE, 55 );
+                    if(MatrixConfigs.DEBUG_MODE)System.out.println("my turn(white)...");         
+					MatrixIterativeDeepeningAlphaBetaSearch search = new MatrixIterativeDeepeningAlphaBetaSearch(game, Double.MIN_VALUE, Double.MAX_VALUE, timeout );
+					search.setLogEnabled(true);
 					Action move = search.makeDecision(state); //trovo qual è mossa migliore
-                    System.out.println("move(white): "+move.toString());
-
-
+					try {
+						this.write(move);
+					} catch (ClassNotFoundException | IOException e) {
+						e.printStackTrace();
+					}
+                    if(MatrixConfigs.DEBUG_MODE)System.out.println("move(white): "+move.toString());
 				}
 				// Turno dell'avversario
 				else if (state.getTurn().equals(StateTablut.Turn.BLACK)) {
@@ -119,10 +123,15 @@ public class TablutMatrixClient extends TablutClient{
 
 			} else { //altrimenti se il giocatore è nero 
 				if (this.getCurrentState().getTurn().equals(StateTablut.Turn.BLACK)) { //se è il turno del nero 
-                    System.out.println("my turn(black)...");
-                    MatrixIterativeDeepeningAlphaBetaSearch search = new MatrixIterativeDeepeningAlphaBetaSearch(game, Double.MIN_VALUE, Double.MAX_VALUE, 55 );
+                    if(MatrixConfigs.DEBUG_MODE)System.out.println("my turn(black)...");
+                    MatrixIterativeDeepeningAlphaBetaSearch search = new MatrixIterativeDeepeningAlphaBetaSearch(game, Double.MIN_VALUE, Double.MAX_VALUE, timeout );
 					Action move = search.makeDecision(state); //trovo qual è mossa migliore
-                    System.out.println("move(black): "+move.toString());
+                    if(MatrixConfigs.DEBUG_MODE)System.out.println("move(black): "+move.toString());
+					try {
+						this.write(move);
+					} catch (ClassNotFoundException | IOException e) {
+						e.printStackTrace();
+					}
 				}
 
 				else if (state.getTurn().equals(StateTablut.Turn.WHITE)) {

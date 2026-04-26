@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import it.unibo.ai.didattica.competition.tablut.ai_matrix.MatrixConfigs;
 import it.unibo.ai.didattica.competition.tablut.ai_matrix.heuristics.BlackHeuristics;
 import it.unibo.ai.didattica.competition.tablut.ai_matrix.heuristics.Heuristics;
 import it.unibo.ai.didattica.competition.tablut.ai_matrix.heuristics.WhiteHeuristics;
@@ -29,6 +30,7 @@ import it.unibo.ai.didattica.competition.tablut.exceptions.*;
  */
 public class GameAshtonTablut implements Game, aima.core.search.adversarial.Game<State, Action, State.Turn> {
 
+	
 	/**
 	 * Number of repeated states that can occur before a draw
 	 */
@@ -770,6 +772,7 @@ public class GameAshtonTablut implements Game, aima.core.search.adversarial.Game
      */
     @Override
     public List<Action> getActions(State state){
+		if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: getActions");
 		List<Action> actions = new ArrayList<Action>();
         State.Turn turn = state.getTurn();
 		/*
@@ -778,7 +781,6 @@ public class GameAshtonTablut implements Game, aima.core.search.adversarial.Game
 		 della pedina scorrere tutti le posizioni possibili finchè la isMoveAcceptable ritorna true.
 		*/
 		Action test_action = null;
-		boolean valid=true;
 		int test_i, test_j;
 		for (int i = 0; i < state.getBoard().length; i++) {
 				for (int j = 0; j < state.getBoard().length; j++) {
@@ -787,60 +789,62 @@ public class GameAshtonTablut implements Game, aima.core.search.adversarial.Game
 						String from = state.getBox(i, j);
 						// i add all the moves in all directions until isMoveAcceptable returns false
 						//on top (incrementing i)
-						valid=true;
-						for(test_i=i, test_j=j;valid;test_i++){
+						for(test_i=i+1, test_j=j;test_i<state.getBoard().length;test_i++){
 							String to = state.getBox(test_i, test_j);
+							//if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: geta "+test_i+" "+test_j);
 							try {
 								test_action = new Action(from, to, turn);
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
 							if(isMoveAcceptable(state, test_action))actions.add(test_action);
-							else valid = false;
+							else break;
 						}
 						//under(i--)
-						valid=true;
-						for(test_i=i, test_j=j;valid;test_i--){
+						for(test_i=i-1, test_j=j;test_i>=0;test_i--){
 							String to = state.getBox(test_i, test_j);
+							//if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: geta "+test_i+" "+test_j);
 							try {
 								test_action = new Action(from, to, turn);
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
 							if(isMoveAcceptable(state, test_action))actions.add(test_action);
-							else valid = false;
+							else break;
 						}
 						//left(j--)
-						valid=true;
-						for(test_i=i, test_j=j;valid;test_j--){
+						for(test_i=i, test_j=j-1;test_j<state.getBoard().length;test_j--){
 							String to = state.getBox(test_i, test_j);
+							//if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: geta "+test_i+" "+test_j);
 							try {
 								test_action = new Action(from, to, turn);
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
 							if(isMoveAcceptable(state, test_action))actions.add(test_action);
-							else valid = false;
+							else break;
 						}
 						//rigth(j++)
-						valid=true;
-						for(test_i=i, test_j=j;valid;test_j++){
+						for(test_i=i, test_j=j+1;test_j>=0;test_j++){
 							String to = state.getBox(test_i, test_j);
+							//if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: geta "+test_i+" "+test_j);
 							try {
 								test_action = new Action(from, to, turn);
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
 							if(isMoveAcceptable(state, test_action))actions.add(test_action);
-							else valid = false;
+							else break;
 						}
 					}
 			}
 		}
+		if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: finish getActions(mosse:"+actions.size()+")");
 		return actions;
 	}
 
 	public boolean isMoveAcceptable(State state, Action a) {
+		if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: isMoveAcceptable("+a.toString()+")");
 		// 1. Controllo formato mossa
     	if (a.getTo().length() != 2 || a.getFrom().length() != 2) {
         	return false;
@@ -957,8 +961,8 @@ public class GameAshtonTablut implements Game, aima.core.search.adversarial.Game
     	}
 
     	// Se passa indenne tutti i controlli, la mossa è perfettamente valida
+		if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: isMoveAcceptable dice mossa accettabile");
     	return true;
-
 		}
 
     /**
