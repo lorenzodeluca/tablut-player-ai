@@ -112,7 +112,7 @@
     </target>
 		
     <target name="MatrixWhiteClient">
-        <java classname="it.unibo.ai.didattica.competition.tablut.ai_matrix.TablutMatrixWhiteClient" fork="true">
+        <java classname="it.unibo.ai.didattica.competition.tablut.ai_matrix.client.TablutMatrixWhiteClient" fork="true">
             <classpath>
                 <pathelement location="lib/aima-core.jar" />
                 <pathelement location="lib/gson-2.2.2.jar"/>
@@ -122,7 +122,7 @@
     </target>
     
     <target name="MatrixBlackClient">
-        <java classname="it.unibo.ai.didattica.competition.tablut.ai_matrix.TablutMatrixBlackClient" fork="true">
+        <java classname="it.unibo.ai.didattica.competition.tablut.ai_matrix.client.TablutMatrixBlackClient" fork="true">
             <classpath>
                 <pathelement location="lib/aima-core.jar" />
                 <pathelement location="lib/gson-2.2.2.jar"/>

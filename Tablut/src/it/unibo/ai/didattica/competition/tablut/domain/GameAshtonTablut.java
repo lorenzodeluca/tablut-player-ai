@@ -1,9 +1,11 @@
 package it.unibo.ai.didattica.competition.tablut.domain;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.FileHandler;
@@ -11,6 +13,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import it.unibo.ai.didattica.competition.tablut.ai_matrix.heuristics.BlackHeuristics;
+import it.unibo.ai.didattica.competition.tablut.ai_matrix.heuristics.Heuristics;
+import it.unibo.ai.didattica.competition.tablut.ai_matrix.heuristics.WhiteHeuristics;
+import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 import it.unibo.ai.didattica.competition.tablut.exceptions.*;
 
 /**
@@ -21,7 +27,7 @@ import it.unibo.ai.didattica.competition.tablut.exceptions.*;
  * @author A. Piretti, Andrea Galassi
  *
  */
-public class GameAshtonTablut implements Game {
+public class GameAshtonTablut implements Game, aima.core.search.adversarial.Game<State, Action, State.Turn> {
 
 	/**
 	 * Number of repeated states that can occur before a draw
@@ -390,8 +396,6 @@ public class GameAshtonTablut implements Game {
 				this.loggGame.fine("Bianco vince con re in " + a.getTo());
 			}
 		}
-		// TODO: implement the winning condition of the capture of the last
-		// black checker
 
 		this.movesWithutCapturing++;
 		return state;
@@ -749,5 +753,320 @@ public class GameAshtonTablut implements Game {
 		this.loggGame.fine("Stato:\n"+state.toString());
 	}
 
+	//methods for deepening alpha beta search
+	/**
+	 * Questi metodi si aggiungono  alla classe base 'GameAshtonTablut' con le meccaniche del gioco
+	 * l'implementazione dei metodi della classe  aima.core.search.adversarial.Game
+	 * in modo da poter usare l'implementazione della DeepeningAlphaBetaSearch
+	 * della libreria aima.
+	 */
 
+	/**
+     * Restituisce la lista di tutte le mosse possibili a partire 
+     * dallo stato corrente del gioco.
+     * 
+     * @param state stato corrente del gioco  
+     * @return ritorna una lista con le possibili mosse
+     */
+    @Override
+    public List<Action> getActions(State state){
+		List<Action> actions = new ArrayList<Action>();
+        State.Turn turn = state.getTurn();
+		/*
+		per ogni pedina devo ottenere tutti i movimenti che può fare... 
+		visto che tutti i movimenti possibili sono ortogonali, mi basta partendo dalla posizione
+		 della pedina scorrere tutti le posizioni possibili finchè la isMoveAcceptable ritorna true.
+		*/
+		Action test_action = null;
+		boolean valid=true;
+		int test_i, test_j;
+		for (int i = 0; i < state.getBoard().length; i++) {
+				for (int j = 0; j < state.getBoard().length; j++) {
+					//if the pawn is of the current playing player
+					if(state.getPawn(i, j).toString().equals(turn.toString()) || (state.getPawn(i, j).equals(State.Pawn.KING) && turn.equals(State.Turn.WHITE)) ){
+						String from = state.getBox(i, j);
+						// i add all the moves in all directions until isMoveAcceptable returns false
+						//on top (incrementing i)
+						valid=true;
+						for(test_i=i, test_j=j;valid;test_i++){
+							String to = state.getBox(test_i, test_j);
+							try {
+								test_action = new Action(from, to, turn);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+							if(isMoveAcceptable(state, test_action))actions.add(test_action);
+							else valid = false;
+						}
+						//under(i--)
+						valid=true;
+						for(test_i=i, test_j=j;valid;test_i--){
+							String to = state.getBox(test_i, test_j);
+							try {
+								test_action = new Action(from, to, turn);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+							if(isMoveAcceptable(state, test_action))actions.add(test_action);
+							else valid = false;
+						}
+						//left(j--)
+						valid=true;
+						for(test_i=i, test_j=j;valid;test_j--){
+							String to = state.getBox(test_i, test_j);
+							try {
+								test_action = new Action(from, to, turn);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+							if(isMoveAcceptable(state, test_action))actions.add(test_action);
+							else valid = false;
+						}
+						//rigth(j++)
+						valid=true;
+						for(test_i=i, test_j=j;valid;test_j++){
+							String to = state.getBox(test_i, test_j);
+							try {
+								test_action = new Action(from, to, turn);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+							if(isMoveAcceptable(state, test_action))actions.add(test_action);
+							else valid = false;
+						}
+					}
+			}
+		}
+		return actions;
+	}
+
+	public boolean isMoveAcceptable(State state, Action a) {
+		// 1. Controllo formato mossa
+    	if (a.getTo().length() != 2 || a.getFrom().length() != 2) {
+        	return false;
+    	}
+    
+    	int columnFrom = a.getColumnFrom();
+    	int columnTo = a.getColumnTo();
+    	int rowFrom = a.getRowFrom();
+    	int rowTo = a.getRowTo();
+
+    	// 2. Controllo se sono fuori dal tabellone
+    	if (columnFrom > state.getBoard().length - 1 || rowFrom > state.getBoard().length - 1
+            	|| rowTo > state.getBoard().length - 1 || columnTo > state.getBoard().length - 1 || columnFrom < 0
+            	|| rowFrom < 0 || rowTo < 0 || columnTo < 0) {
+        	return false;
+    	}
+
+    	// 3. Controllo che non vada sul trono
+    	if (state.getPawn(rowTo, columnTo).equalsPawn(State.Pawn.THRONE.toString())) {
+        	return false;
+    	}
+
+    	// 4. Controllo la casella di arrivo (deve essere vuota)
+    	if (!state.getPawn(rowTo, columnTo).equalsPawn(State.Pawn.EMPTY.toString())) {
+        	return false;
+    	}
+
+    	// 5. Controlli sulle Citadel (accampamenti neri)
+    	if (this.citadels.contains(state.getBox(rowTo, columnTo))
+            	&& !this.citadels.contains(state.getBox(rowFrom, columnFrom))) {
+        	return false;
+    	}
+    	if (this.citadels.contains(state.getBox(rowTo, columnTo))
+            	&& this.citadels.contains(state.getBox(rowFrom, columnFrom))) {
+        	if (rowFrom == rowTo) {
+            	if (columnFrom - columnTo > 5 || columnFrom - columnTo < -5) {
+                	return false;
+            	}
+        	} else {
+            	if (rowFrom - rowTo > 5 || rowFrom - rowTo < -5) {
+                	return false;
+            	}
+        	}
+    	}
+
+    	// 6. Controllo se cerco di stare fermo
+    	if (rowFrom == rowTo && columnFrom == columnTo) {
+        	return false;
+    	}
+
+    	// 7. Controllo se sto muovendo una pedina giusta per il mio turno
+    	if (state.getTurn().equalsTurn(State.Turn.WHITE.toString())) {
+        	if (!state.getPawn(rowFrom, columnFrom).equalsPawn("W")
+                	&& !state.getPawn(rowFrom, columnFrom).equalsPawn("K")) {
+            	return false;
+        	}
+    	}
+    	if (state.getTurn().equalsTurn(State.Turn.BLACK.toString())) {
+        	if (!state.getPawn(rowFrom, columnFrom).equalsPawn("B")) {
+            	return false;
+        	}
+    	}
+
+    	// 8. Controllo di non muovere in diagonale
+    	if (rowFrom != rowTo && columnFrom != columnTo) {
+        	return false;
+    	}
+
+    	// 9. Controllo di non scavalcare pedine 
+    	if (rowFrom == rowTo) {
+        	if (columnFrom > columnTo) {
+            	for (int i = columnTo; i < columnFrom; i++) {
+                	if (!state.getPawn(rowFrom, i).equalsPawn(State.Pawn.EMPTY.toString())) {
+                    	return false; // Scavalca pedina o Trono
+                	}
+                	if (this.citadels.contains(state.getBox(rowFrom, i))
+                        	&& !this.citadels.contains(state.getBox(a.getRowFrom(), a.getColumnFrom()))) {
+                    	return false; // Scavalca Citadel
+                	}
+            	}
+        	} else {
+            	for (int i = columnFrom + 1; i <= columnTo; i++) {
+                	if (!state.getPawn(rowFrom, i).equalsPawn(State.Pawn.EMPTY.toString())) {
+                    	return false; // Scavalca pedina o Trono
+                	}
+                	if (this.citadels.contains(state.getBox(rowFrom, i))
+                        	&& !this.citadels.contains(state.getBox(a.getRowFrom(), a.getColumnFrom()))) {
+                    	return false; // Scavalca Citadel
+                	}
+            	}
+        	}
+    	} else {
+        	if (rowFrom > rowTo) {
+            	for (int i = rowTo; i < rowFrom; i++) {
+                	if (!state.getPawn(i, columnFrom).equalsPawn(State.Pawn.EMPTY.toString())) {
+                	    return false; // Scavalca pedina o Trono
+                	}
+                	if (this.citadels.contains(state.getBox(i, columnFrom))
+                        	&& !this.citadels.contains(state.getBox(a.getRowFrom(), a.getColumnFrom()))) {
+                    	return false; // Scavalca Citadel
+                	}
+            	}
+        	} else {
+            	for (int i = rowFrom + 1; i <= rowTo; i++) {
+                	if (!state.getPawn(i, columnFrom).equalsPawn(State.Pawn.EMPTY.toString())) {
+                    	return false; // Scavalca pedina o Trono
+                	}
+                	if (this.citadels.contains(state.getBox(i, columnFrom))
+                        	&& !this.citadels.contains(state.getBox(a.getRowFrom(), a.getColumnFrom()))) {
+                    	return false; // Scavalca Citadel
+                	}
+            	}
+        	}
+    	}
+
+    	// Se passa indenne tutti i controlli, la mossa è perfettamente valida
+    	return true;
+
+		}
+
+    /**
+     * Restituisce lo stato iniziale della partita.
+     * 
+     * 
+     * @return ritorna lo stato iniziale della partita
+     */
+    @Override
+    public State getInitialState() {
+        // not needed for DeepeningAlphaBetaSearch
+        throw new UnsupportedOperationException("Unimplemented method 'getInitialState'");
+    }
+
+    /**
+     * Individua il prossimo giocatore a fare la mossa in base allo stato 
+     * attuale del gioco
+     * 
+     * @param state stato corrente del gioco  
+     * @return ritorna il giocatore che deve fare la prossima mossa
+     */
+    @Override
+    public Turn getPlayer(State state) { //il prossimo giocatore a fare la mossa
+        return state.getTurn();
+    }
+
+    /**
+     *  Restituisce i giocatori che partecipano alla partita (BLACK e WHITE).
+     * 
+     * @return ritorna una lista con i giocatori
+     */
+    @Override
+    public Turn[] getPlayers() {
+        return Arrays.copyOfRange(State.Turn.values(), 0, 2);
+    }
+
+   /**
+     * Restituisce lo stato risultante dall'applicazione di una certa azione
+     * ad uno stato dato.
+     *
+     * @param state lo stato corrente della partita
+     * @param action l'azione da applicare
+     * @return il nuovo stato risultante dopo aver eseguito l'azione
+     */
+    @Override
+    public State getResult(State state, Action action) {
+        // move pawn
+        state = this.movePawn(state.clone(), action);
+
+        // check the state for any capture
+        if (state.getTurn().equalsTurn("W")) {
+            state = this.checkCaptureBlack(state, action);
+        } else if (state.getTurn().equalsTurn("B")) {
+            state = this.checkCaptureWhite(state, action);
+        }
+        return state;
+    }
+
+    //metodi che usano l'euristica
+    /**
+     * Calcola l'utilità (punteggio) di uno stato di gioco dal punto di vista
+     * di un determinato giocatore.
+     *
+     * Se lo stato è terminale:
+     * - restituisce +infinito se il giocatore ha vinto
+     * - restituisce -infinito se il giocatore ha perso
+     *
+     * Se lo stato non è terminale:
+     * applica una funzione euristica diversa a seconda del giocatore
+     * (WhiteHeuristics o BlackHeuristics) per stimare la qualità dello stato
+     *
+     * @param state lo stato della partita da valutare
+     * @param turn il giocatore (WHITE o BLACK) per cui calcolare l'utilità
+     * @return un valore numerico che rappresenta quanto lo stato è favorevole
+     *         per il giocatore
+     */
+    @Override
+    public double getUtility(State state, Turn turn) {
+        if ((turn.equals(State.Turn.WHITE) && state.getTurn().equals(State.Turn.WHITEWIN)) || (turn.equals(State.Turn.BLACK) && state.getTurn().equals(State.Turn.BLACKWIN)) ){
+            //vittoria
+            return Double.POSITIVE_INFINITY;
+        } 
+		else if ((turn.equals(State.Turn.WHITE) && state.getTurn().equals(State.Turn.BLACKWIN)) || (turn.equals(State.Turn.BLACK) && state.getTurn().equals(State.Turn.WHITEWIN)) ) {
+            //sconfitta
+            return Double.NEGATIVE_INFINITY;
+        }
+
+
+        // se non è uno stato finale 
+        Heuristics heuristics = null;
+        if (turn.equals(State.Turn.WHITE)) {
+            heuristics = new WhiteHeuristics(state);
+        } else {
+            heuristics = new BlackHeuristics(state);
+        }
+        return  heuristics.evaluateState();
+    }
+
+    /**
+     * Verifica se lo stato fornito è uno stato terminale,
+     * ovvero una condizione di fine partita (vittoria o sconfitta).
+     *
+     * @param state lo stato da verificare
+     * @return true se lo stato è terminale, false altrimenti
+     */
+    @Override
+    public boolean isTerminal(State state) {
+        if (state.getTurn().equals(State.Turn.WHITEWIN) || state.getTurn().equals(State.Turn.BLACKWIN) || state.getTurn().equals(State.Turn.DRAW)) return true;
+		return false;
+    }
 }

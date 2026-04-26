@@ -11,6 +11,6 @@ public class TablutMatrixWhiteClient {
 		if (args.length>0){
 			array = new String[]{"WHITE", args[0]};
 		}
-		TablutRandomClient.main(array);
+		TablutMatrixClient.main(array);
 	}
 }

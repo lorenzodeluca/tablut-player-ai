@@ -11,6 +11,6 @@ public class TablutMatrixBlackClient {
 		if (args.length>0){
 			array = new String[]{"BLACK", args[0]};
 		}
-		TablutRandomClient.main(array);
+		TablutMatrixClient.main(array);
 	}
 }

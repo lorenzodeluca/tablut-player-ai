@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import it.unibo.ai.didattica.competition.tablut.ai_matrix.MatrixGameForDeepeningAlphaBetaSearch;
 import it.unibo.ai.didattica.competition.tablut.ai_matrix.MatrixIterativeDeepeningAlphaBetaSearch;
 import it.unibo.ai.didattica.competition.tablut.client.TablutClient;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.Game;
+import it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 import it.unibo.ai.didattica.competition.tablut.domain.StateBrandub;
@@ -65,10 +65,10 @@ public class TablutMatrixClient extends TablutClient{
 
 		State state;
 
-		MatrixGameForDeepeningAlphaBetaSearch game = null;
+		GameAshtonTablut game = null;
         state = new StateTablut();
         state.setTurn(State.Turn.WHITE);
-        game = new MatrixGameForDeepeningAlphaBetaSearch(state, 0, -1, "logs", "white_matrix", "black_matrix");
+        game = new GameAshtonTablut(state, 0, -1, "logs", "white_matrix", "black_matrix");
         System.out.println("Ashton Tablut game - matrix client");
 
 		List<int[]> pawns = new ArrayList<int[]>();
@@ -89,7 +89,6 @@ public class TablutMatrixClient extends TablutClient{
 
 			if (this.getPlayer().equals(Turn.WHITE)) { //se il giocatore è bianco  
 				if (this.getCurrentState().getTurn().equals(StateTablut.Turn.WHITE)) { //if its white turn
-					// TODO: white logic
                     System.out.println("my turn(white)...");
                     
 					MatrixIterativeDeepeningAlphaBetaSearch search = new MatrixIterativeDeepeningAlphaBetaSearch(game, Double.MIN_VALUE, Double.MAX_VALUE, 55 );
