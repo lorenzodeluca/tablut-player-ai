@@ -93,6 +93,21 @@ public abstract class Heuristics {
         return blackPawnsNearKing;
     }
 
+    public int whitePawnsNearKing() {
+        int whitePawnsNearKing = 0;
+        int[] king= getKingPosition();
+        State.Pawn[][] board = state.getBoard();
+		//sopra al re
+        if(board[king[0]+1][king[1]]==Pawn.WHITE)whitePawnsNearKing++;
+		//sotto al re
+		if(board[king[0]-1][king[1]]==Pawn.WHITE)whitePawnsNearKing++;
+		//sinistra del re
+        if(board[king[0]][king[1]-1]==Pawn.WHITE)whitePawnsNearKing++;
+		//destra del re
+		if(board[king[0]][king[1]+1]==Pawn.WHITE)whitePawnsNearKing++;
+        return whitePawnsNearKing;
+    }
+
     public boolean isThereACampUnder(int y, int x){
         //bottom camps
         if(y==1&&(x==3||x==5))return true;
@@ -206,5 +221,12 @@ public abstract class Heuristics {
         if(blackPawnsCampCapture())return true;
         if(twoPawnsKingCapture())return true;
 		return false;
+    }
+
+    // trova il bordo della scacchiera più vicino alla posizione attuale del re
+    public double manhattanToNearestBorder(int kingRow, int kingColumn) {
+        int distTopToBottom = Math.min(kingRow, 8 - kingRow);
+        int distLeftToRight = Math.min(kingColumn, 8 - kingColumn);
+        return Math.min(distTopToBottom, distLeftToRight);
     }
 }
