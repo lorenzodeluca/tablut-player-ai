@@ -772,7 +772,7 @@ public class GameAshtonTablut implements Game, aima.core.search.adversarial.Game
      */
     @Override
     public List<Action> getActions(State state){
-		if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: getActions");
+		//if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: getActions");
 		List<Action> actions = new ArrayList<Action>();
         State.Turn turn = state.getTurn();
 		/*
@@ -839,16 +839,16 @@ public class GameAshtonTablut implements Game, aima.core.search.adversarial.Game
 					}
 			}
 		}
-		if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: finish getActions(mosse:"+actions.size()+")");
+		// if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: finish getActions(mosse:"+actions.size()+")");
 		return actions;
 	}
 
 	public boolean isMoveAcceptable(State state, Action a) {
-		if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: isMoveAcceptable("+a.toString()+")");
+		//if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: isMoveAcceptable("+a.toString()+")");
 		// 1. Controllo formato mossa
-    	if (a.getTo().length() != 2 || a.getFrom().length() != 2) {
-        	return false;
-    	}
+    	//if (a.getTo().length() != 2 || a.getFrom().length() != 2) {
+        //	return false;
+    	//}
     
     	int columnFrom = a.getColumnFrom();
     	int columnTo = a.getColumnTo();
@@ -856,11 +856,11 @@ public class GameAshtonTablut implements Game, aima.core.search.adversarial.Game
     	int rowTo = a.getRowTo();
 
     	// 2. Controllo se sono fuori dal tabellone
-    	if (columnFrom > state.getBoard().length - 1 || rowFrom > state.getBoard().length - 1
-            	|| rowTo > state.getBoard().length - 1 || columnTo > state.getBoard().length - 1 || columnFrom < 0
-            	|| rowFrom < 0 || rowTo < 0 || columnTo < 0) {
-        	return false;
-    	}
+    	//if (columnFrom > state.getBoard().length - 1 || rowFrom > state.getBoard().length - 1
+        //    	|| rowTo > state.getBoard().length - 1 || columnTo > state.getBoard().length - 1 || columnFrom < 0
+        //    	|| rowFrom < 0 || rowTo < 0 || columnTo < 0) {
+        //	return false;
+    	//}
 
     	// 3. Controllo che non vada sul trono
     	if (state.getPawn(rowTo, columnTo).equalsPawn(State.Pawn.THRONE.toString())) {
@@ -961,9 +961,9 @@ public class GameAshtonTablut implements Game, aima.core.search.adversarial.Game
     	}
 
     	// Se passa indenne tutti i controlli, la mossa è perfettamente valida
-		if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: isMoveAcceptable dice mossa accettabile");
+		//if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: isMoveAcceptable dice mossa accettabile");
     	return true;
-		}
+	}
 
     /**
      * Restituisce lo stato iniziale della partita.
