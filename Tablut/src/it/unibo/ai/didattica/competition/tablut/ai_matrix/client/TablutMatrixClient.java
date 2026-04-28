@@ -21,7 +21,7 @@ public class TablutMatrixClient extends TablutClient{
     private static String role = "";
     private static String name = "Matrix";
     private static String ipAddress = "localhost";
-    private static int timeout = 55;
+    private static int timeout = 58;
 
 	public TablutMatrixClient(String player, String name, int timeout, String ipAddress) throws UnknownHostException, IOException {
 		super(player, name, timeout, ipAddress);
@@ -32,7 +32,7 @@ public class TablutMatrixClient extends TablutClient{
 	}
 
 	public TablutMatrixClient(String player) throws UnknownHostException, IOException {
-		this(player, "Matrix", 55, "localhost");
+		this(player, "Matrix", timeout, "localhost");
 	}
 
 
@@ -41,7 +41,7 @@ public class TablutMatrixClient extends TablutClient{
 			System.out.println("You must specify which player you are (WHITE or BLACK)");
 			System.exit(-1);
 		} else {
-			System.out.println("ROLE: "+ args[0]);
+			System.out.println("ROLE: "+ args[0]); 
 			role = args[0].toUpperCase();
 		}
 		if (args.length == 2) {

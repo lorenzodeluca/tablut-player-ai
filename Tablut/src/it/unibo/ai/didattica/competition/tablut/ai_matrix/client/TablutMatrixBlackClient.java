@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 
 import it.unibo.ai.didattica.competition.tablut.client.TablutRandomClient;
 
+//TODO: cancellare client bianco e nero e tenere solo quello generico?
 public class TablutMatrixBlackClient {
     public static void main(String[] args) throws UnknownHostException, ClassNotFoundException, IOException {
 		String[] array = new String[]{"BLACK"};

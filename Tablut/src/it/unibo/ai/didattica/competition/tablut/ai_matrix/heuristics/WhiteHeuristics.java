@@ -7,12 +7,13 @@ import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 
 public class WhiteHeuristics extends Heuristics {
-    public static double BLACK_PAWNS_COUNT = 16;
-    public static double WHITE_PAWNS_COUNT = 8;
+    public static double STARTING_BLACK_PAWNS_COUNT = 16;
+    public static double STARTING_WHITE_PAWNS_COUNT = 8;
     public static double WEIGHT_ALIVE = 0.15;
     public static double WEIGHT_KILLED = 0.15;
     public static double WEIGHT_KING_ESCAPE_ROUTES = 0.45; // peso della distanza del re dalla migliore via di fuga (una tra riga 2, riga 6, colonna 2, colonna 6)
     public static double WEIGHT_KING_GUARDS = 0.25; // "guardie" (pedine bianche) attorno al re
+    //TODO considerare se aggiungere un peso al numero di pedine nere intorno al re
 
 
     public WhiteHeuristics(State state) {
@@ -24,6 +25,10 @@ public class WhiteHeuristics extends Heuristics {
      * ogni valore per la valutazione dello stato deve essere tra 0 e 1
      */
     public double evaluateState() {
+        //if (whiteWin())
+        //    return 1.0;
+        //if (blackWin())
+        //    return 0.0;
         if (state.getTurn().equals(Turn.WHITEWIN)) return 1.0;
         if (state.getTurn().equals(Turn.BLACKWIN)) return 0.0;
         if (state.getTurn().equals(Turn.DRAW)) return 0.5;
@@ -35,14 +40,26 @@ public class WhiteHeuristics extends Heuristics {
         // Tutti i punteggi vengono normalizzati tra 0 e 1
 
         // alive paws vs eaten pawns
-        double whitePawnsAliveValue = boardCount(Pawn.WHITE) / WHITE_PAWNS_COUNT;
-        double blackPawnsEatenValue = 1 - (boardCount(Pawn.BLACK) / BLACK_PAWNS_COUNT);
+        double current_white_pawns=boardCount(Pawn.WHITE);
+        double current_black_pawns=boardCount(Pawn.BLACK);
+        double whitePawnsAliveValue = current_white_pawns / STARTING_WHITE_PAWNS_COUNT;
+        double blackPawnsEatenValue = 1 - (boardCount(Pawn.BLACK) / STARTING_BLACK_PAWNS_COUNT);
 
         // calcolo della possibile via di fuga (autostrade)
         double escapeValue = escapeRoute(kingPos);
 
         // numero di soldati bianchi adiacenti al re
         double guardsNearKing = whitePawnsNearKing() / 4.0;
+
+        
+        //dynamic weights
+        if(blackPawnsEatenValue<=5){
+            WEIGHT_KILLED = 0.30;
+            WEIGHT_KING_ESCAPE_ROUTES = 0.30;
+        }else{
+            WEIGHT_KILLED = 0.15;
+            WEIGHT_KING_ESCAPE_ROUTES = 0.45;
+        }
 
         // calcolo dei pesi
         double aliveWeighted = WEIGHT_ALIVE * whitePawnsAliveValue;
@@ -52,10 +69,7 @@ public class WhiteHeuristics extends Heuristics {
 
         double res = aliveWeighted + killedWeighted + kingDistanceWeighted + guardsNearKing;
 
-        //if (whiteWin())
-        //    return 1.0;
-        //if (blackWin())
-        //    return 0.0;
+   
 
         return res;
     }
