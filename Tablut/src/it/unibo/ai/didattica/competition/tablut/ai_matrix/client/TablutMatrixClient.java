@@ -21,7 +21,7 @@ public class TablutMatrixClient extends TablutClient{
     private static String role = "";
     private static String name = "Matrix";
     private static String ipAddress = "localhost";
-    private static int timeout = 58;
+    private static int timeout = 59;
 
 	public TablutMatrixClient(String player, String name, int timeout, String ipAddress) throws UnknownHostException, IOException {
 		super(player, name, timeout, ipAddress);

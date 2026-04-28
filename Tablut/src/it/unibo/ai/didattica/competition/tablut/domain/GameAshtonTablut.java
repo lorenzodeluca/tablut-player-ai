@@ -813,7 +813,7 @@ public class GameAshtonTablut implements Game, aima.core.search.adversarial.Game
 							else break;
 						}
 						//left(j--)
-						for(test_i=i, test_j=j-1;test_j<state.getBoard().length;test_j--){
+						for(test_i=i, test_j=j-1;test_j>=0;test_j--){
 							String to = state.getBox(test_i, test_j);
 							//if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: geta "+test_i+" "+test_j);
 							try {
@@ -825,7 +825,7 @@ public class GameAshtonTablut implements Game, aima.core.search.adversarial.Game
 							else break;
 						}
 						//rigth(j++)
-						for(test_i=i, test_j=j+1;test_j>=0;test_j++){
+						for(test_i=i, test_j=j+1;test_j<state.getBoard().length;test_j++){
 							String to = state.getBox(test_i, test_j);
 							//if(MatrixConfigs.DEBUG_MODE)System.out.println("DEBUG: geta "+test_i+" "+test_j);
 							try {
