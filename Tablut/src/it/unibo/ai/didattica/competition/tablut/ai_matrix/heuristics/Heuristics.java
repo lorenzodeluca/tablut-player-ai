@@ -93,6 +93,72 @@ public abstract class Heuristics {
         return blackPawnsNearKing;
     }
 
+    public boolean isThereACampUnder(int y, int x){
+        //bottom camps
+        if(y==1&&(x==3||x==5))return true;
+        if(y==2&&x==4)return true;
+        //left camps
+        if(y==5&&x==1)return true;
+        //right camps
+        if(y==5&&x==7)return true;
+        return false;
+    }
+
+    public boolean isThereACampOnTop(int y, int x){
+        //top camps
+        if(y==7&&(x==3||x==5))return true;
+        if(y==6&&x==4)return true;
+        //left camps
+        if(y==3&&x==1)return true;
+        //right camps
+        if(y==3&&x==7)return true;
+        return false;
+    }
+
+    public boolean isThereACampOnTheLeft(int y, int x){
+        //left camps
+        if(x==1&&(y==3||y==5))return true;
+        if(x==2&&y==4)return true;
+        //top camps
+        if(y==7&&x==5)return true;
+        //bottom camps
+        if(y==1&&x==5)return true;
+        return false;
+    }
+
+    public boolean isThereACampOnTheRight(int y, int x){
+        //right camps
+        if(x==7&&(y==3||y==5))return true;
+        if(x==6&&y==4)return true;
+        //top camps
+        if(y==7&&x==3)return true;
+        //bottom camps
+        if(y==1&&x==3)return true;
+        return false;
+    }
+
+    public boolean blackPawnsCampCapture() {
+        int[] king= getKingPosition();
+        State.Pawn[][] board = state.getBoard();
+		//nero sopra al re e campo sotto
+        if(board[king[0]+1][king[1]]==Pawn.BLACK && isThereACampUnder(king[0], king[1]))return true;
+		//nero sotto al re e campo sopra
+		if(board[king[0]-1][king[1]]==Pawn.BLACK && isThereACampOnTop(king[0], king[1]))return true;
+		//nero a sinistra del re e campo a destra
+        if(board[king[0]][king[1]-1]==Pawn.BLACK && isThereACampOnTheRight(king[0], king[1]))return true;
+		//nero a destra del re
+		if(board[king[0]][king[1]+1]==Pawn.BLACK && isThereACampOnTheLeft(king[0], king[1]))return true;
+        return false;
+    }
+
+    public boolean twoPawnsKingCapture(){
+        int[] king= getKingPosition();
+        State.Pawn[][] board = state.getBoard();
+        if(board[king[0]][king[1]-1]==Pawn.BLACK && board[king[0]][king[1]+1]==Pawn.BLACK)return true;
+        if(board[king[0]-1][king[1]]==Pawn.BLACK && board[king[0]+1][king[1]]==Pawn.BLACK)return true;
+        return false;
+    }
+
 	
     /**
      * Verifica se il re si trova nella casella centrale (castello).
@@ -136,7 +202,9 @@ public abstract class Heuristics {
      */
 	public boolean blackWin(){
         if(isKingInCastle() && blackPawnsNearKing()==4)return true;
-        if(isKingInCastle() && blackPawnsNearKing()==3)return true;
-		return blackPawnsNearKing()==2;
+        if(isKingNearCastle() && blackPawnsNearKing()==3)return true;
+        if(blackPawnsCampCapture())return true;
+        if(twoPawnsKingCapture())return true;
+		return false;
     }
 }
