@@ -29,70 +29,13 @@ public class BlackHeuristics extends Heuristics {
         if (state.getTurn().equals(Turn.WHITEWIN)) return Double.NEGATIVE_INFINITY;
         if (state.getTurn().equals(Turn.DRAW)) return 0.5;
 
-        //MODIFICA 
-        // il bianco può vincere alla prossima mossa → posizione pessima
-        if (whiteCanWinNext()) {
-            return -0.9;
-        }
-
-        // il nero può catturare il re alla prossima mossa → posizione ottima
-        if (blackCanCaptureKingNext()) {
-            return +0.9; 
-        }
-        
         int[] king = getKingPosition();
         int kr = king[0];
         int kc = king[1];
 
-        double blackAlive = boardCount(Pawn.BLACK) / BLACK_PAWNS_COUNT;
-        double whiteEaten = (WHITE_PAWNS_COUNT - boardCount(Pawn.WHITE)) / WHITE_PAWNS_COUNT;
-
-        double kingDistance = 1.0 - (manhattanToNearestBorder(kr, kc) / 8.0); // già in [0,1], alto = re vicino al bordo
-        double kingOpenLines = countKingOpenLines() / 4.0;
-        double kingAdjBlack = blackPawnsNearKing() / 4.0;
-        double kingAdjWhite = whitePawnsNearKing() / 4.0;
-        double kingMobility = countFreeNeighbours(kr, kc) / 4.0;
-        double blackEscapeBlock = countBlackOnEscapeRing() / 12.0;
-        double whiteEscapeSupport = countWhiteOnEscapeRing() / 12.0;
-
+        double kingDistance = 1.0 - (manhattanToNearestBorder(kr, kc) / 8.0); 
         double score = 0.0;
-
-        // Se il re può vincere subito, posizione pessima per il nero
-        // Uso una penalizzazione piccola ma forte, compatibile con [0,1]
-        if (hasImmediateKingWin()) {
-            score -= 0.35;
-        }
-
-        // Parte continua dell'euristica:
-        // premio ciò che favorisce il nero e penalizzo ciò che favorisce il bianco
-        score += WEIGHT_ALIVE * blackAlive;
-        score += WEIGHT_KILLED * whiteEaten;
         score -= WEIGHT_KING_ESCAPE_ROUTES * kingDistance;
-        score -= WEIGHT_OPEN_LINES * kingOpenLines;
-        score += WEIGHT_BLACK_NEAR_KING * kingAdjBlack;
-        score -= WEIGHT_WHITE_NEAR_KING * kingAdjWhite;
-        score -= WEIGHT_KING_MOBILITY * kingMobility;
-        score += WEIGHT_BLACK_ESCAPE_BLOCK * blackEscapeBlock;
-        score -= WEIGHT_WHITE_ESCAPE_SUPPORT * whiteEscapeSupport;
-
-        int needed = kingRequiredCapturers();
-        int blackNear = blackPawnsNearKing();
-
-        // Bonus tattici di quasi-cattura del re, tutti piccoli e compatibili con [0,1]
-        if (needed == 2 && blackNear == 1) score += 0.10;
-        if (needed == 2 && blackNear == 2) score += 0.25;
-
-        if (needed == 3 && blackNear == 1) score += 0.05;
-        if (needed == 3 && blackNear == 2) score += 0.12;
-        if (needed == 3 && blackNear == 3) score += 0.25;
-
-        if (needed == 4 && blackNear == 2) score += 0.06;
-        if (needed == 4 && blackNear == 3) score += 0.15;
-
-        // Re sul trono: leggermente meglio per il nero, perché è meno vicino all'uscita
-        if (isKingInCastle()) {
-            score += 0.04;
-        }
 
         return score;
     }
@@ -333,53 +276,5 @@ public int countWhiteOnEscapeRing() {
         return countKingOpenLines() >= 1;
     } 
 
-
-
-
-    /*Questa funzione serve a capire se il nero ha già una cattura quasi immediata del re,
-    cioè se la posizione è tatticamente molto pericolosa per il bianco*/
-    public boolean blackCanCaptureKingNext() {
-        int[] king = getKingPosition();
-        int y = king[0];
-        int x = king[1];
-
-        int needed = kingRequiredCapturers();
-        int blackNear = blackPawnsNearKing();
-
-        if (blackWin()) {
-            return true;
-        }
-
-        if (needed == 4 && blackNear >= 3) return true;
-        if (needed == 3 && blackNear >= 2) return true;
-        if (needed == 2 && blackNear >= 1) return true;
-
-        if (blackPawnsCampCapture()) return true;
-        if (twoPawnsKingCapture()) return true;
-
-        return false;
-    }
-
-
-
-    // controlla se il re ha una fuga realmente immediata verso il bordo
-    public boolean kingCanEscapeNextMove() {
-        int[] king = getKingPosition();
-        int y = king[0];
-        int x = king[1];
-
-        if (whiteWin()) {
-            return true;
-        }
-
-        if (countKingOpenLines() == 0) {
-            return false;
-        }
-
-        if (y == 1 || y == 7 || x == 1 || x == 7) {
-            return true;
-        }
-
-        return false;
-    }
 }
+
