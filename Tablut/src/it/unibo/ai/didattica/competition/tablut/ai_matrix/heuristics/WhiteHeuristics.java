@@ -10,10 +10,10 @@ public class WhiteHeuristics extends Heuristics {
     public static double STARTING_BLACK_PAWNS_COUNT = 16;
     public static double STARTING_WHITE_PAWNS_COUNT = 8;
     public static double WEIGHT_ALIVE = 0.15;
-    public static double WEIGHT_KILLED = 0.15;
+    public static double WEIGHT_KILLED = 0.10;
     public static double WEIGHT_KING_ESCAPE_ROUTES = 0.45; // peso della distanza del re dalla migliore via di fuga (una tra riga 2, riga 6, colonna 2, colonna 6)
-    public static double WEIGHT_KING_GUARDS = 0.25; // "guardie" (pedine bianche) attorno al re
-    public static double WEIGHT_BLACK_NEAR_KING = -0.35; // pedine nere attorno al re
+    public static double WEIGHT_KING_GUARDS = 0.10; // "guardie" (pedine bianche) attorno al re
+    public static double WEIGHT_BLACK_NEAR_KING = 0.20; // pedine nere attorno al re
 
 
     public WhiteHeuristics(State state) {
@@ -25,8 +25,6 @@ public class WhiteHeuristics extends Heuristics {
      * ogni valore per la valutazione dello stato deve essere tra 0 e 1
      */
     public double evaluateState() {
-        if (whiteWin()) return Double.POSITIVE_INFINITY;
-        if (blackWin()) return Double.NEGATIVE_INFINITY;
         if (state.getTurn().equals(Turn.DRAW)) return 0.5;
 
         int[] kingPos = getKingPosition();
@@ -62,12 +60,19 @@ public class WhiteHeuristics extends Heuristics {
             WEIGHT_KING_ESCAPE_ROUTES = 0.45;
         }
 
+        if(blacksNearKing>0 && blacksNearKing*2>=pawnsToEatKing()){
+            //molte volte perdiamo perchè ci mangiano il re dopo averlo intrappolato... sarebbe bello premiare il mangiare dei pawns vicino al re
+            WEIGHT_KING_GUARDS = 0.30;
+            WEIGHT_KING_ESCAPE_ROUTES= 0.40;
+            WEIGHT_BLACK_NEAR_KING = 0.30;
+        }
+
         // calcolo dei pesi
         double aliveWeighted = WEIGHT_ALIVE * whitePawnsAliveValue;
         double killedWeighted = WEIGHT_KILLED * blackPawnsEatenValue;
         double kingDistanceWeighted = WEIGHT_KING_ESCAPE_ROUTES * escapeValue;
         double kingGuardsWeighted = WEIGHT_KING_GUARDS * guardsNearKing;
-        double kingDangerWeighted = WEIGHT_BLACK_NEAR_KING * blacksNearKing;  //peso negativo
+        double kingDangerWeighted = WEIGHT_BLACK_NEAR_KING * (1-blacksNearKing);
 
         double res = aliveWeighted + killedWeighted + kingDistanceWeighted + kingGuardsWeighted + kingDangerWeighted;
 

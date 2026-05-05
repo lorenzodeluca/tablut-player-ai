@@ -114,6 +114,17 @@ public class MatrixIterativeDeepeningAlphaBetaSearch extends IterativeDeepeningA
             if ((System.currentTimeMillis() - startTime) > (duration - 2000) ||!heuristicUsedThreadSafe.get() ) break;
         }
 
+         // --- LOGGING SECTION ---
+        if(MatrixConfigs.DEBUG_MODE){
+            System.out.println("--- Search Summary ---");
+            System.out.println("Final Depth Reached: " + this.currDepthLimit);
+            System.out.println("Total Nodes Expanded: " + nodesExpandedThreadSafe.sum());
+            System.out.println("Best Move: " + bestAction.toString());
+            System.out.println("Search Time: " + (System.currentTimeMillis() - startTime) + "ms");
+            System.out.println("----------------------"); 
+         }
+        
+
         return bestAction;
     }
 

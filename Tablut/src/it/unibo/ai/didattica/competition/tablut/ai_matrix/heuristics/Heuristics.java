@@ -223,6 +223,12 @@ public abstract class Heuristics {
 		return false;
     }
 
+    public double pawnsToEatKing(){
+        if(isKingInCastle())return 4;
+        if(isKingNearCastle())return 3;
+		return 2;
+    }
+
     // trova il bordo della scacchiera più vicino alla posizione attuale del re
     public double manhattanToNearestBorder(int kingRow, int kingColumn) {
         int distTopToBottom = Math.min(kingRow, 8 - kingRow);
