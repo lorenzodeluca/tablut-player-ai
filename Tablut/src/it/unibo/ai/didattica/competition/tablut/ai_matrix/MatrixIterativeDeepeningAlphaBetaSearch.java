@@ -19,11 +19,11 @@ public class MatrixIterativeDeepeningAlphaBetaSearch extends IterativeDeepeningA
     private final ForkJoinPool customThreadPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
     private final LongAdder nodesExpandedThreadSafe = new LongAdder();
     private final AtomicBoolean heuristicUsedThreadSafe = new AtomicBoolean(false);
-    private int timeout;
+    private final int timeoutSeconds;
 
     public MatrixIterativeDeepeningAlphaBetaSearch(Game<State, Action, State.Turn> game, double min, double max, int time) {
         super(game, min, max, time);
-        timeout = time;
+        this.timeoutSeconds = time;
     }
 
     @Override
@@ -31,68 +31,92 @@ public class MatrixIterativeDeepeningAlphaBetaSearch extends IterativeDeepeningA
         nodesExpandedThreadSafe.reset();
         State.Turn player = this.game.getPlayer(state);
         List<Action> results = this.orderActions(state, this.game.getActions(state), player, 0);
-        
-        // Timer is already started inside the AIMA library usually, 
-        // but ensure it's accessible or re-implement timing logic.
-        long startTime = System.currentTimeMillis();
-        long duration = 1000L * timeout; 
+        final List<Action> orderedResults = results;
 
+        long startTime = System.currentTimeMillis();
+        long duration = 1000L * timeoutSeconds;
         this.currDepthLimit = 0;
         Action bestAction = results.get(0);
 
-        do {
+        // Iterative Deepening Loop
+        while (true) {
             this.currDepthLimit++;
             heuristicUsedThreadSafe.set(false);
 
-            // Parallel evaluation of root actions
-            List<Action> actionsToEvaluate = results;
+            final int depth = this.currDepthLimit;
+            
+            // Valutazione parallela delle mosse alla radice
+            final List<Action> currentResults = results;
             List<MoveValue> evaluatedMoves = customThreadPool.submit(() ->
-                actionsToEvaluate.parallelStream().map(action -> {
-                    // Each thread evaluates its branch
-                    double value = minValue(this.game.getResult(state, action), 
-                                            player, Double.NEGATIVE_INFINITY, 
-                                            Double.POSITIVE_INFINITY, 1);
+                currentResults.parallelStream().map(action -> {
+                    // Creiamo uno stato risultante per ogni mossa
+                    State nextState = this.game.getResult(state, action); 
+                    // Chiamiamo la NOSTRA versione thread-safe di minValue
+                    double value = threadSafeMinValue(nextState, player, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1, depth, startTime, duration);
                     return new MoveValue(action, value);
                 }).collect(Collectors.toList())
             ).join();
 
-            // Sort results by value descending (best move first)
+            // Ordiniamo i risultati (best move first per la prossima iterazione)
             evaluatedMoves.sort(Comparator.comparingDouble(mv -> -mv.value));
-            
-            // Check if we found a winning move or if time is up
-            if (!evaluatedMoves.isEmpty()) {
-                results = evaluatedMoves.stream().map(mv -> mv.action).collect(Collectors.toList());
-                bestAction = results.get(0);
-                
-                // Optional: break if utility is maxed (win found)
-                if (evaluatedMoves.get(0).value >= utilMax) break;
-            }
+            results = evaluatedMoves.stream().map(mv -> mv.action).collect(Collectors.toList());
+            bestAction = results.get(0);
 
-        } while ((System.currentTimeMillis() - startTime) < (duration - 2000) && heuristicUsedThreadSafe.get());
+            // Logging immediato della profondità completata
+            System.out.println("Completed Depth: " + depth + " | Best move: " + bestAction + " | Value: " + evaluatedMoves.get(0).value);
+
+            // Condizioni di uscita:
+            // 1. Trovata vittoria certa
+            if (evaluatedMoves.get(0).value >= utilMax) break; 
+            // 2. Timeout o non abbiamo usato euristiche (albero finito)
+            if ((System.currentTimeMillis() - startTime) > (duration - 2000) || !heuristicUsedThreadSafe.get()) break;
+        }
 
         return bestAction;
     }
 
-    @Override
-    public double minValue(State state, State.Turn player, double alpha, double beta, int depth) {
+    // Metodo MIN thread-safe (non usa super.minValue)
+    private double threadSafeMinValue(State state, State.Turn player, double alpha, double beta, int depth, int limit, long start, long duration) {
         nodesExpandedThreadSafe.increment();
-        return super.minValue(state, player, alpha, beta, depth);
+        
+        if (this.game.isTerminal(state) || depth >= limit || (System.currentTimeMillis() - start) > (duration - 500)) {
+            return this.eval(state, player);
+        }
+
+        double value = Double.POSITIVE_INFINITY;
+        for (Action action : this.game.getActions(state)) {
+            value = Math.min(value, threadSafeMaxValue(this.game.getResult(state, action), player, alpha, beta, depth + 1, limit, start, duration));
+            if (value <= alpha) return value;
+            beta = Math.min(beta, value);
+        }
+        return value;
+    }
+
+    // Metodo MAX thread-safe (non usa super.maxValue)
+    private double threadSafeMaxValue(State state, State.Turn player, double alpha, double beta, int depth, int limit, long start, long duration) {
+        nodesExpandedThreadSafe.increment();
+
+        if (this.game.isTerminal(state) || depth >= limit || (System.currentTimeMillis() - start) > (duration - 500)) {
+            return this.eval(state, player);
+        }
+
+        double value = Double.NEGATIVE_INFINITY;
+        for (Action action : this.game.getActions(state)) {
+            value = Math.max(value, threadSafeMinValue(this.game.getResult(state, action), player, alpha, beta, depth + 1, limit, start, duration));
+            if (value >= beta) return value;
+            alpha = Math.max(alpha, value);
+        }
+        return value;
     }
 
     @Override
     protected double eval(State state, State.Turn player) {
-        heuristicUsedThreadSafe.set(true);
-        return game.getUtility(state, player);
+        if (!this.game.isTerminal(state)) {
+            heuristicUsedThreadSafe.set(true);
+        }
+        return this.game.getUtility(state, player);
     }
 
-    @Override
-    public Metrics getMetrics() {
-        Metrics m = super.getMetrics();
-        m.set(METRICS_NODES_EXPANDED, nodesExpandedThreadSafe.sum());
-        return m;
-    }
-
-    // Helper class for parallel results
     private static class MoveValue {
         Action action;
         double value;

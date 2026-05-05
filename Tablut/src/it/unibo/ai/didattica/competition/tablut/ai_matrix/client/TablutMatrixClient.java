@@ -1,3 +1,15 @@
+/* GenAI statement
+ * For writing the code included in this project GenAI tools were used mainly with the goal of supporting the design and 
+ * optimization of the evaluation heuristics for the Matrix Tablut AI.
+ * These tools were put to use to optimize board scanning and move selection algorithms.  
+ * We take responsibility for all the modifications and optimizations we made due to the GenAI tools advices.
+ * 
+ * Tools: GitHub Copilot, Gemini, Perplexity
+ * Queries/use period: 14/3/2026 - 12/5/2026
+ * Reason: Coding support, shortening development time, helping with spotting coding mistakes.
+ *  
+ */
+
 package it.unibo.ai.didattica.competition.tablut.ai_matrix.client;
 
 import java.io.IOException;

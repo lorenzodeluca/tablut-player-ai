@@ -338,44 +338,44 @@ public int countWhiteOnEscapeRing() {
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  blackCanCaptureKingNext  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
     // verifica se il nero può catturare il re alla prossima mossa
     public boolean blackCanCaptureKingNext() {
+
         int[] king = getKingPosition();
         int kr = king[0];
         int kc = king[1];
 
         int needed = kingRequiredCapturers();
+
+        // conta quanti neri sono già intorno al re
         int blackNear = blackPawnsNearKing();
 
-        // se manca solo 1 lato → potenziale cattura
-        if (blackNear == needed - 1) {
-
-            // controlla se esiste una casella libera dove il nero può chiudere
-            if (canBlackReachClosingPosition(kr, kc)) {
-                return true;
-            }
+        // se non siamo già in una situazione di quasi-cattura, inutile continuare
+        if (blackNear < needed - 1) {
+            return false;
         }
-        return false;
-    }
 
-    // Controlla se esiste almeno una casella libera adiacente al re
-    // che il nero possa occupare per chiudere la cattura.
-    private boolean canBlackReachClosingPosition(int kr, int kc) {
-        // direzioni attorno al re
+        // controlla se esiste UNA casella mancante che può essere occupata subito
         int[][] directions = {
             {-1, 0}, {1, 0}, {0, -1}, {0, 1}
         };
 
         for (int[] d : directions) {
+
             int r = kr + d[0];
             int c = kc + d[1];
 
-            // deve essere una casella valida
+            // la casella deve essere libera e valida
             if (!isFreeCell(r, c)) continue;
 
-            // ora controlla se un nero può arrivarci
+            // deve esistere un nero che può raggiungerla legalmente
             if (existsBlackThatCanReach(r, c)) {
-                return true;
+
+                // controllo fondamentale: dopo questa mossa la cattura è completa
+                if (wouldKingBeCapturedAfterMove(kr, kc, r, c)) {
+                    return true;
+                }
             }
         }
+
         return false;
     }
 
@@ -423,6 +423,20 @@ public int countWhiteOnEscapeRing() {
         }
         return true;
     }
+
+    /*
+    // Verifica se, occupando la casella (br, bc), il numero di neri
+    // adiacenti al re diventa sufficiente per completare la cattura.
+    */
+    private boolean wouldKingBeCapturedAfterMove(int kr, int kc, int br, int bc) {
+
+        // simula: aggiungo un nero nella posizione (br, bc)
+        int needed = kingRequiredCapturers();
+
+        int count = blackPawnsNearKing() + 1;
+
+        return count >= needed;
+    }
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  blackCanCaptureKingNext  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
 
 
@@ -451,7 +465,7 @@ public int countWhiteOnEscapeRing() {
             if (isCampCell(r, c)) return false;
             if (r == 4 && c == 4) return false;
 
-            // se arrivo al bordo → vittoria
+            // se arrivo al bordo -> vittoria
             if (r == 0 || r == 8 || c == 0 || c == 8) {
                 return true;
             }
