@@ -74,8 +74,7 @@ public class MatrixIterativeDeepeningAlphaBetaSearch extends IterativeDeepeningA
         State.Turn player = this.game.getPlayer(state);
 
         // Otteniamo e ordiniamo le mosse legali per migliorare l'efficacia della potatura
-        List<Action> results =
-            this.orderActions(state, this.game.getActions(state), player, 0);
+        List<Action> results = this.orderActions(state, this.game.getActions(state), player, 0);
 
         long startTime = System.currentTimeMillis();
         long duration = 1000L * timeoutSeconds;
@@ -87,18 +86,16 @@ public class MatrixIterativeDeepeningAlphaBetaSearch extends IterativeDeepeningA
             this.currDepthLimit++;
             heuristicUsedThreadSafe.set(false);
             final int depth = this.currDepthLimit;
-
-            final List<Action> currentActions = results;
+            final List<Action> rootActions = results;
 
             // Parallelizzazione: ogni mossa alla radice viene valutata in un thread separato
             List<MoveValue> evaluatedMoves = customThreadPool.submit(() ->
-                currentActions
-                .parallelStream()
-                .map(action -> {
-                        State nextState = this.game.getResult(state, action);
-                        // Avvia la ricerca Minimax thread-safe per il sotto-albero di questa azione
-                        double value = threadSafeMinValue(nextState,player,Double.NEGATIVE_INFINITY,Double.POSITIVE_INFINITY,1,depth,startTime,duration);
-                        return new MoveValue(action, value);
+                rootActions.parallelStream().map(action -> {
+                    // Creiamo uno stato risultante per ogni mossa
+                    State nextState = this.game.getResult(state, action); 
+                    // Chiamiamo la NOSTRA versione thread-safe di minValue
+                    double value = threadSafeMinValue(nextState, player, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1, depth, startTime, duration);
+                    return new MoveValue(action, value);
                 }).collect(Collectors.toList())
             ).join();
 
@@ -180,6 +177,14 @@ public class MatrixIterativeDeepeningAlphaBetaSearch extends IterativeDeepeningA
             alpha = Math.max(alpha, value);
         }
         return value;
+    }
+
+    @Override
+    protected double eval(State state, State.Turn player) {
+        if (!this.game.isTerminal(state)) {
+            heuristicUsedThreadSafe.set(true);
+        }
+        return this.game.getUtility(state, player);
     }
 
     /**
