@@ -32,12 +32,20 @@ public class BlackHeuristics extends Heuristics {
         //MODIFICA 
         // il bianco può vincere alla prossima mossa → posizione pessima
         if (whiteCanWinNext()) {
+<<<<<<< HEAD
             return -0.9;
+=======
+            return -0.9; // oppure anche -1 se vuoi essere aggressivo
+>>>>>>> 962ba42e6ddef066490a7ec1b7e9a01b8fc444f0
         }
 
         // il nero può catturare il re alla prossima mossa → posizione ottima
         if (blackCanCaptureKingNext()) {
+<<<<<<< HEAD
             return +0.9; 
+=======
+            return +0.9; // oppure anche +1
+>>>>>>> 962ba42e6ddef066490a7ec1b7e9a01b8fc444f0
         }
         
         int[] king = getKingPosition();
@@ -335,6 +343,7 @@ public int countWhiteOnEscapeRing() {
 
 
 
+<<<<<<< HEAD
 
     /*Questa funzione serve a capire se il nero ha già una cattura quasi immediata del re,
     cioè se la posizione è tatticamente molto pericolosa per il bianco*/
@@ -383,3 +392,28 @@ public int countWhiteOnEscapeRing() {
         return false;
     }
 }
+=======
+/*Questa funzione serve a capire se il nero ha già una cattura quasi immediata del re,
+cioè se la posizione è tatticamente molto pericolosa per il bianco*/
+public boolean blackCanCaptureKingNext() {
+    int[] king = getKingPosition();
+    int y = king[0];
+    int x = king[1];
+
+    int needed = kingRequiredCapturers();
+    int blackNear = blackPawnsNearKing();
+
+    if (blackWin()) {
+        return true;
+    }
+
+    if (needed == 4 && blackNear >= 3) return true;
+    if (needed == 3 && blackNear >= 2) return true;
+    if (needed == 2 && blackNear >= 1) return true;
+
+    if (blackPawnsCampCapture()) return true;
+    if (twoPawnsKingCapture()) return true;
+
+    return false;
+}
+>>>>>>> 962ba42e6ddef066490a7ec1b7e9a01b8fc444f0

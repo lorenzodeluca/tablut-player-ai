@@ -222,7 +222,11 @@ public class WhiteHeuristics extends Heuristics {
         if(validRoutes == 0) {
             res = 0.0;
         } else if (validRoutes == 1) {
+<<<<<<< HEAD
             res = 0.70; // ho una via ottima, ma è solo una: il nero può bloccarla 
+=======
+            res = 0.75; // ho una via ottima, ma è solo una: il nero può bloccarla 
+>>>>>>> 962ba42e6ddef066490a7ec1b7e9a01b8fc444f0
         } else {
             res = 1.0; // 2 o più vie di fuga libere
         }
