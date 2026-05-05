@@ -13,7 +13,7 @@ public class WhiteHeuristics extends Heuristics {
     public static double WEIGHT_KILLED = 0.15;
     public static double WEIGHT_KING_ESCAPE_ROUTES = 0.45; // peso della distanza del re dalla migliore via di fuga (una tra riga 2, riga 6, colonna 2, colonna 6)
     public static double WEIGHT_KING_GUARDS = 0.25; // "guardie" (pedine bianche) attorno al re
-    public static double WEIGHT_BLACK_NEAR_KING = -0.35; // pedine nere attorno al re
+    //TODO considerare se aggiungere un peso al numero di pedine nere intorno al re
 
 
     public WhiteHeuristics(State state) {
@@ -27,51 +27,7 @@ public class WhiteHeuristics extends Heuristics {
     public double evaluateState() {
         if (whiteWin()) return Double.POSITIVE_INFINITY;
         if (blackWin()) return Double.NEGATIVE_INFINITY;
-        if (state.getTurn().equals(Turn.DRAW)) return 0.5;
-
-        int[] kingPos = getKingPosition();
-        int kingRow = kingPos[0];
-        int kingCol = kingPos[1];
-
-        // Tutti i punteggi vengono normalizzati tra 0 e 1
-
-        // alive paws vs eaten pawns
-        double current_white_pawns=boardCount(Pawn.WHITE);
-        double current_black_pawns=boardCount(Pawn.BLACK);
-        double eatenBlackPawns = STARTING_BLACK_PAWNS_COUNT - current_black_pawns;
-
-        double whitePawnsAliveValue = current_white_pawns / STARTING_WHITE_PAWNS_COUNT;
-        double blackPawnsEatenValue = 1 - (boardCount(Pawn.BLACK) / STARTING_BLACK_PAWNS_COUNT);
-
-        // calcolo della possibile via di fuga (autostrade)
-        double escapeValue = escapeRoute(kingPos);
-
-        // numero di soldati bianchi adiacenti al re
-        double guardsNearKing = whitePawnsNearKing() / 4.0;
-
-        // numero di pedine nere adiacenti al re
-        double blacksNearKing = blackPawnsNearKing() / 4.0;
-
-        
-        // dynamic weights
-        if(eatenBlackPawns <= 5) {
-            WEIGHT_KILLED = 0.30;
-            WEIGHT_KING_ESCAPE_ROUTES = 0.30;
-        } else {
-            WEIGHT_KILLED = 0.15;
-            WEIGHT_KING_ESCAPE_ROUTES = 0.45;
-        }
-
-        // calcolo dei pesi
-        double aliveWeighted = WEIGHT_ALIVE * whitePawnsAliveValue;
-        double killedWeighted = WEIGHT_KILLED * blackPawnsEatenValue;
-        double kingDistanceWeighted = WEIGHT_KING_ESCAPE_ROUTES * escapeValue;
-        double kingGuardsWeighted = WEIGHT_KING_GUARDS * guardsNearKing;
-        double kingDangerWeighted = WEIGHT_BLACK_NEAR_KING * blacksNearKing;
-
-        double res = aliveWeighted + killedWeighted + kingDistanceWeighted + kingGuardsWeighted + kingDangerWeighted;
-
-        return res;
+        return 1 - (boardCount(Pawn.BLACK) / STARTING_BLACK_PAWNS_COUNT);
     }
 
     /*
@@ -88,12 +44,8 @@ public class WhiteHeuristics extends Heuristics {
      * [4,4]
      */
 
-    // aggiunta a escapeRoute una logica: se il re ha 2 vie di fuga libere, punteggio maggiore (il nero ne può bloccare solo una)
-    // se ne ha solo una, si favoriscono le mosse in tale direzione ma non vince in automatico poiché può ancora essere bloccato
-
     public double escapeRoute(int[] kingPos) {
         double res = 0;
-        int validRoutes = 0;
         int obstacles = 0;
 
         // riga 2
@@ -117,11 +69,11 @@ public class WhiteHeuristics extends Heuristics {
                 if (kingPos[0] == 4 && kingPos[1] == 4) {
                     if ((state.getPawn(3, 3).equalsPawn(State.Pawn.WHITE.toString()) &&
                             state.getPawn(3, 5).equalsPawn(State.Pawn.WHITE.toString())) || freeRow(3)) {
-                        validRoutes++;
+                        res = 1;
                     }
                 } else {
                     // il re non è sul trono
-                    validRoutes++;
+                    res = 1;
                 }
             }
         }
@@ -148,11 +100,11 @@ public class WhiteHeuristics extends Heuristics {
                 if (kingPos[0] == 4 && kingPos[1] == 4) {
                     if ((state.getPawn(5, 3).equalsPawn(State.Pawn.WHITE.toString()) &&
                             state.getPawn(5, 5).equalsPawn(State.Pawn.WHITE.toString())) || freeRow(5)) {
-                        validRoutes++;
+                        res = 1;
                     }
                 } else {
                     // il re non è sul trono
-                    validRoutes++;
+                    res = 1;
                 }
             }
         }
@@ -179,11 +131,11 @@ public class WhiteHeuristics extends Heuristics {
                 if (kingPos[0] == 4 && kingPos[1] == 4) {
                     if ((state.getPawn(3, 3).equalsPawn(State.Pawn.WHITE.toString()) &&
                             state.getPawn(5, 3).equalsPawn(State.Pawn.WHITE.toString())) || freeColumn(3)) {
-                        validRoutes++;
+                        res = 1;
                     }
                 } else {
                     // il re non è sul trono
-                    validRoutes++;
+                    res = 1;
                 }
             }
         }
@@ -210,21 +162,13 @@ public class WhiteHeuristics extends Heuristics {
                 if (kingPos[0] == 4 && kingPos[1] == 4) {
                     if ((state.getPawn(3, 5).equalsPawn(State.Pawn.WHITE.toString()) &&
                             state.getPawn(5, 5).equalsPawn(State.Pawn.WHITE.toString())) || freeColumn(5)) {
-                        validRoutes++;
+                        res = 1;
                     }
                 } else {
                     // il re non è sul trono
-                    validRoutes++;
+                    res = 1;
                 }
             }
-        }
-
-        if(validRoutes == 0) {
-            res = 0.0;
-        } else if (validRoutes == 1) {
-            res = 0.75; // ho una via ottima, ma è solo una: il nero può bloccarla 
-        } else {
-            res = 1.0; // 2 o più vie di fuga libere
         }
 
         return res;
