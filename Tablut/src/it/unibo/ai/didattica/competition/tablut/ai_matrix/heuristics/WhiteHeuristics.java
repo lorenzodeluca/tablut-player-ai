@@ -25,12 +25,8 @@ public class WhiteHeuristics extends Heuristics {
      * ogni valore per la valutazione dello stato deve essere tra 0 e 1
      */
     public double evaluateState() {
-        //if (whiteWin())
-        //    return 1.0;
-        //if (blackWin())
-        //    return 0.0;
-        if (state.getTurn().equals(Turn.WHITEWIN)) return 1.0;
-        if (state.getTurn().equals(Turn.BLACKWIN)) return 0.0;
+        if (whiteWin()) return Double.POSITIVE_INFINITY;
+        if (blackWin()) return Double.NEGATIVE_INFINITY;
         if (state.getTurn().equals(Turn.DRAW)) return 0.5;
 
         int[] kingPos = getKingPosition();
@@ -42,6 +38,7 @@ public class WhiteHeuristics extends Heuristics {
         // alive paws vs eaten pawns
         double current_white_pawns=boardCount(Pawn.WHITE);
         double current_black_pawns=boardCount(Pawn.BLACK);
+        double eatenBlackPawns = STARTING_BLACK_PAWNS_COUNT - current_black_pawns;
         double whitePawnsAliveValue = current_white_pawns / STARTING_WHITE_PAWNS_COUNT;
         double blackPawnsEatenValue = 1 - (boardCount(Pawn.BLACK) / STARTING_BLACK_PAWNS_COUNT);
 
@@ -51,12 +48,15 @@ public class WhiteHeuristics extends Heuristics {
         // numero di soldati bianchi adiacenti al re
         double guardsNearKing = whitePawnsNearKing() / 4.0;
 
+        // numero di pedine nere adiacenti al re
+        double 
+
         
         //dynamic weights
-        if(blackPawnsEatenValue<=5){
+        if(eatenBlackPawns<=5) {
             WEIGHT_KILLED = 0.30;
             WEIGHT_KING_ESCAPE_ROUTES = 0.30;
-        }else{
+        } else {
             WEIGHT_KILLED = 0.15;
             WEIGHT_KING_ESCAPE_ROUTES = 0.45;
         }
