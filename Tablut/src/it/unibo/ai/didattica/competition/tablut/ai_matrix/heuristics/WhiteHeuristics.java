@@ -9,11 +9,13 @@ import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 public class WhiteHeuristics extends Heuristics {
     public static double STARTING_BLACK_PAWNS_COUNT = 16;
     public static double STARTING_WHITE_PAWNS_COUNT = 8;
-    public static double WEIGHT_ALIVE = 0.15;
-    public static double WEIGHT_KILLED = 0.10;
-    public static double WEIGHT_KING_ESCAPE_ROUTES = 0.45; // peso della distanza del re dalla migliore via di fuga (una tra riga 2, riga 6, colonna 2, colonna 6)
-    public static double WEIGHT_KING_GUARDS = 0.10; // "guardie" (pedine bianche) attorno al re
-    public static double WEIGHT_BLACK_NEAR_KING = 0.20; // pedine nere attorno al re
+
+    //per aggiornare i weights di default modificare resetToStockWeights();
+    public static double WEIGHT_ALIVE = 0;
+    public static double WEIGHT_KILLED = 0;
+    public static double WEIGHT_KING_ESCAPE_ROUTES = 0; // peso della distanza del re dalla migliore via di fuga (una tra riga 2, riga 6, colonna 2, colonna 6)
+    public static double WEIGHT_KING_GUARDS = 0; // "guardie" (pedine bianche) attorno al re
+    public static double WEIGHT_BLACK_NEAR_KING = 0; // pedine nere attorno al re
 
 
     public WhiteHeuristics(State state) {
@@ -25,6 +27,7 @@ public class WhiteHeuristics extends Heuristics {
      * ogni valore per la valutazione dello stato deve essere tra 0 e 1
      */
     public double evaluateState() {
+        resetToStockWeights();
         if (state.getTurn().equals(Turn.DRAW)) return 0.5;
 
         int[] kingPos = getKingPosition();
@@ -63,8 +66,10 @@ public class WhiteHeuristics extends Heuristics {
         if(blacksNearKing>0 && blacksNearKing*2>=pawnsToEatKing()){
             //molte volte perdiamo perchè ci mangiano il re dopo averlo intrappolato... sarebbe bello premiare il mangiare dei pawns vicino al re
             WEIGHT_KING_GUARDS = 0.30;
-            WEIGHT_KING_ESCAPE_ROUTES= 0.40;
+            WEIGHT_KING_ESCAPE_ROUTES= 0.30;
             WEIGHT_BLACK_NEAR_KING = 0.30;
+            WEIGHT_ALIVE = 0.05;
+            WEIGHT_KILLED = 0.05;
         }
 
         // calcolo dei pesi
@@ -77,6 +82,14 @@ public class WhiteHeuristics extends Heuristics {
         double res = aliveWeighted + killedWeighted + kingDistanceWeighted + kingGuardsWeighted + kingDangerWeighted;
 
         return res;
+    }
+
+    public void resetToStockWeights(){
+        WEIGHT_ALIVE = 0.15;
+        WEIGHT_KILLED = 0.10;
+        WEIGHT_KING_ESCAPE_ROUTES = 0.45;
+        WEIGHT_KING_GUARDS = 0.10; 
+        WEIGHT_BLACK_NEAR_KING = 0.20; 
     }
 
     /*
@@ -95,7 +108,6 @@ public class WhiteHeuristics extends Heuristics {
 
     // aggiunta a escapeRoute una logica: se il re ha 2 vie di fuga libere, punteggio maggiore (il nero ne può bloccare solo una)
     // se ne ha solo una, si favoriscono le mosse in tale direzione ma non vince in automatico poiché può ancora essere bloccato
-
     public double escapeRoute(int[] kingPos) {
         double res = 0;
         int validRoutes = 0;

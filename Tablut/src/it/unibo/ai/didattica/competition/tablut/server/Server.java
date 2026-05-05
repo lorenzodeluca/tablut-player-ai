@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.logging.*;
 
+import it.unibo.ai.didattica.competition.tablut.ai_matrix.MatrixConfigs;
 import it.unibo.ai.didattica.competition.tablut.domain.*;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 import it.unibo.ai.didattica.competition.tablut.gui.Gui;
@@ -317,7 +318,7 @@ public class Server implements Runnable {
 			loggSys.addHandler(fh);
 			fh.setFormatter(new SimpleFormatter());
 			loggSys.setLevel(Level.FINE);
-			loggSys.fine("Accensione server");
+			if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("Accensione server");
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -325,16 +326,16 @@ public class Server implements Runnable {
 
 		switch (this.gameC) {
 		case 1:
-			loggSys.fine("Partita di ClassicTablut");
+			if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("Partita di ClassicTablut");
 			break;
 		case 2:
-			loggSys.fine("Partita di ModernTablut");
+			if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("Partita di ModernTablut");
 			break;
 		case 3:
-			loggSys.fine("Partita di Brandub");
+			if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("Partita di Brandub");
 			break;
 		case 4:
-			loggSys.fine("Partita di Tablut");
+			if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("Partita di Tablut");
 			break;
 		default:
 			System.out.println("Error in game selection");
@@ -383,7 +384,7 @@ public class Server implements Runnable {
 			tc = new TCPConnection(socketWhite);
 			t = new Thread(tc);
 			t.start();
-			loggSys.fine("Waiting for white connection..");
+			if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("Waiting for white connection..");
 			// timeout for connection
 			try {
 				int counter = 0;
@@ -401,7 +402,7 @@ public class Server implements Runnable {
 			}
 			
 			white = tc.getSocket();
-			loggSys.fine("White player connected");
+			if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("White player connected");
 			whiteMove = new DataInputStream(white.getInputStream());
 			whiteState = new DataOutputStream(white.getOutputStream());
 			Turnwhite = new TCPInput(whiteMove);
@@ -409,7 +410,7 @@ public class Server implements Runnable {
 			// NAME READING
 			t = new Thread(Turnwhite);
 			t.start();
-			loggSys.fine("Lettura nome player bianco in corso..");
+			if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("Lettura nome player bianco in corso..");
 			// timeout for name declaration
 			try {
 				int counter = 0;
@@ -436,14 +437,14 @@ public class Server implements Runnable {
 			}
 			whiteName = temp;
 			System.out.println("White player name:\t" + whiteName);
-			loggSys.fine("White player name:\t" + whiteName);
+			if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("White player name:\t" + whiteName);
 
 			
 			// ESTABLISHING CONNECTION
 			tc = new TCPConnection(socketBlack);
 			t = new Thread(tc);
 			t.start();
-			loggSys.fine("Waiting for Black connection..");
+			if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("Waiting for Black connection..");
 			// timeout for connection
 			try {
 				int counter = 0;
@@ -460,7 +461,7 @@ public class Server implements Runnable {
 				System.exit(0);
 			}
 			black = tc.getSocket();
-			loggSys.fine("Accettata connessione con client giocatore Nero");
+			if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("Accettata connessione con client giocatore Nero");
 			blackMove = new DataInputStream(black.getInputStream());
 			blackState = new DataOutputStream(black.getOutputStream());
 			Turnblack = new TCPInput(blackMove);
@@ -468,7 +469,7 @@ public class Server implements Runnable {
 			// NAME READING
 			t = new Thread(Turnblack);
 			t.start();
-			loggSys.fine("Lettura nome player nero in corso..");
+			if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("Lettura nome player nero in corso..");
 			try {
 				// timer for the move
 				int counter = 0;
@@ -495,7 +496,7 @@ public class Server implements Runnable {
 					temp += c;
 			}
 			System.out.println("Black player name:\t" + blackName);
-			loggSys.fine("Black player name:\t" + blackName);
+			if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("Black player name:\t" + blackName);
 			blackName = temp;
 
 		} catch (IOException e) {
@@ -539,13 +540,13 @@ public class Server implements Runnable {
 			theGson = gson.toJson(state);
 			StreamUtils.writeString(whiteState, theGson);
 			StreamUtils.writeString(blackState, theGson);
-			loggSys.fine("Invio messaggio ai giocatori");
+			if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("Invio messaggio ai giocatori");
 			if (enableGui) {
 				theGui.update(state);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			loggSys.fine("Errore invio messaggio ai giocatori");
+			if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("Errore invio messaggio ai giocatori");
 			loggSys.warning("Chiusura sistema");
 			System.exit(1);
 		}
@@ -560,7 +561,7 @@ public class Server implements Runnable {
 			// create the process that listen the answer
 			t = new Thread(tin);
 			t.start();
-			loggSys.fine("Lettura mossa player " + state.getTurn() + " in corso..");
+			if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("Lettura mossa player " + state.getTurn() + " in corso..");
 			try {
 				// timer for the move
 				int counter = 0;
@@ -583,7 +584,7 @@ public class Server implements Runnable {
 			// APPLY MOVE
 			// translate the string into an action object
 			move = this.gson.fromJson(theGson, Action.class);
-			loggSys.fine("Move received.\t" + move.toString());
+			if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("Move received.\t" + move.toString());
 			move.setTurn(state.getTurn());
 			System.out.println("Suggested move: " + move.toString());
 
@@ -638,7 +639,7 @@ public class Server implements Runnable {
 				theGson = gson.toJson(state);
 				StreamUtils.writeString(whiteState, theGson);
 				StreamUtils.writeString(blackState, theGson);
-				loggSys.fine("Invio messaggio ai client");
+				if(MatrixConfigs.DEFAULT_SERVER_FILE_LOGGER)loggSys.fine("Invio messaggio ai client");
 				if (enableGui) {
 					theGui.update(state);
 				}
