@@ -67,7 +67,7 @@ public class WhiteHeuristics extends Heuristics {
         double killedWeighted = WEIGHT_KILLED * blackPawnsEatenValue;
         double kingDistanceWeighted = WEIGHT_KING_ESCAPE_ROUTES * escapeValue;
         double kingGuardsWeighted = WEIGHT_KING_GUARDS * guardsNearKing;
-        double kingDangerWeighted = WEIGHT_BLACK_NEAR_KING * blacksNearKing;  //peso negativo
+        double kingDangerWeighted = WEIGHT_BLACK_NEAR_KING * blacksNearKing;
 
         double res = aliveWeighted + killedWeighted + kingDistanceWeighted + kingGuardsWeighted + kingDangerWeighted;
 
