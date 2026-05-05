@@ -6,7 +6,7 @@
  * 
  * Tools: GitHub Copilot, Gemini, Perplexity
  * Queries/use period: 14/3/2026 - 12/5/2026
- * Reason: Coding support, shortening development time, helping with spotting coding mistakes.
+ * Reason: Coding support, shortening development time, help with spotting coding mistakes.
  *  
  */
 

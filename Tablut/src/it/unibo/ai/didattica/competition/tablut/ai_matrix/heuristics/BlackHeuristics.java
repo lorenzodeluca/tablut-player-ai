@@ -343,35 +343,28 @@ public int countWhiteOnEscapeRing() {
         int kr = king[0];
         int kc = king[1];
 
-        int needed = kingRequiredCapturers();
-
-        // conta quanti neri sono già intorno al re
-        int blackNear = blackPawnsNearKing();
-
-        // se non siamo già in una situazione di quasi-cattura, inutile continuare
-        if (blackNear < needed - 1) {
-            return false;
-        }
-
-        // controlla se esiste UNA casella mancante che può essere occupata subito
-        int[][] directions = {
+        int[][] dirs = {
             {-1, 0}, {1, 0}, {0, -1}, {0, 1}
         };
 
-        for (int[] d : directions) {
+        // prova tutte le mosse nere
+        for (int r1 = 0; r1 < 9; r1++) {
+            for (int c1 = 0; c1 < 9; c1++) {
 
-            int r = kr + d[0];
-            int c = kc + d[1];
+                if (state.getPawn(r1, c1) != Pawn.BLACK) continue;
 
-            // la casella deve essere libera e valida
-            if (!isFreeCell(r, c)) continue;
+                for (int[] d : dirs) {
 
-            // deve esistere un nero che può raggiungerla legalmente
-            if (existsBlackThatCanReach(r, c)) {
+                    int r2 = r1 + d[0];
+                    int c2 = c1 + d[1];
 
-                // controllo fondamentale: dopo questa mossa la cattura è completa
-                if (wouldKingBeCapturedAfterMove(kr, kc, r, c)) {
-                    return true;
+                    if (!isFreeCell(r2, c2)) continue;
+                    if (!isPathFree(r1, c1, r2, c2)) continue;
+
+                    // verifica cattura reale dopo la mossa
+                    if (isKingCapturedAfterBlackMove(r1, c1, r2, c2)) {
+                        return true;
+                    }
                 }
             }
         }
@@ -379,6 +372,70 @@ public int countWhiteOnEscapeRing() {
         return false;
     }
 
+    private boolean isKingCapturedAfterBlackMove(int fromR, int fromC, int toR, int toC) {
+
+        int[] king = getKingPosition();
+        int kr = king[0];
+        int kc = king[1];
+
+        int needed = kingRequiredCapturers();
+
+        int blockedSides = 0;
+
+        int[][] dirs = {
+            {-1, 0}, {1, 0}, {0, -1}, {0, 1}
+        };
+
+        for (int[] d : dirs) {
+
+            int r = kr + d[0];
+            int c = kc + d[1];
+
+            // se la mossa del nero occupa questo lato
+            if (r == toR && c == toC) {
+                blockedSides++;
+                continue;
+            }
+
+            // fuori board = blocco (bordo)
+            if (r < 0 || r >= 9 || c < 0 || c >= 9) {
+                blockedSides++;
+                continue;
+            }
+
+            Pawn p = state.getPawn(r, c);
+
+            // blocco valido secondo regole Tablut
+            if (p == Pawn.BLACK || isCampCell(r, c) || (r == 4 && c == 4)) {
+                blockedSides++;
+            }
+        }
+
+        return blockedSides >= needed;
+    }
+    
+    //Controlla se il percorso tra due caselle sulla stessa riga o colonna
+    //è libero da pedine, campi e trono
+    private boolean isPathFree(int r1, int c1, int r2, int c2) {
+        int dr = Integer.compare(r2, r1);
+        int dc = Integer.compare(c2, c1);
+
+        int r = r1 + dr;
+        int c = c1 + dc;
+
+        while (r != r2 || c != c2) {
+
+            if (state.getPawn(r, c) != Pawn.EMPTY) return false;
+            if (isCampCell(r, c)) return false;
+            if (r == 4 && c == 4) return false;
+
+            r += dr;
+            c += dc;
+        }
+        return true;
+    }
+
+/*
     // Verifica se esiste almeno una pedina nera che può arrivare
     // sulla casella obiettivo in linea retta.
     private boolean existsBlackThatCanReach(int targetR, int targetC) {
@@ -402,32 +459,9 @@ public int countWhiteOnEscapeRing() {
 
         return false;
     }
-
-    /*Controlla se il percorso tra due caselle sulla stessa riga o colonna
-    è libero da pedine, campi e trono*/
-    private boolean isPathFree(int r1, int c1, int r2, int c2) {
-        int dr = Integer.compare(r2, r1);
-        int dc = Integer.compare(c2, c1);
-
-        int r = r1 + dr;
-        int c = c1 + dc;
-
-        while (r != r2 || c != c2) {
-
-            if (state.getPawn(r, c) != Pawn.EMPTY) return false;
-            if (isCampCell(r, c)) return false;
-            if (r == 4 && c == 4) return false;
-
-            r += dr;
-            c += dc;
-        }
-        return true;
-    }
-
-    /*
+    
     // Verifica se, occupando la casella (br, bc), il numero di neri
     // adiacenti al re diventa sufficiente per completare la cattura.
-    */
     private boolean wouldKingBeCapturedAfterMove(int kr, int kc, int br, int bc) {
 
         // simula: aggiungo un nero nella posizione (br, bc)
@@ -437,6 +471,7 @@ public int countWhiteOnEscapeRing() {
 
         return count >= needed;
     }
+*/
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  blackCanCaptureKingNext  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
 
 
