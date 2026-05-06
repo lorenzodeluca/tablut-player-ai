@@ -79,25 +79,25 @@ public class WhiteHeuristics extends Heuristics {
     }
 
     public void resetToDefaultStrategyWeights(){ // main goal: default strategy, the goal is for the king to escape
-        WEIGHT_ALIVE = 0.15;
-        WEIGHT_KILLED = 0.10;
-        WEIGHT_KING_ESCAPE_ROUTES = 0.45;
-        WEIGHT_KING_GUARDS = 0.10; 
+        WEIGHT_ALIVE = 0.35; // abbiamo poche pedine... dobbiamo evitare il più possibile di perderle
+        WEIGHT_KILLED = 0.05;
+        WEIGHT_KING_ESCAPE_ROUTES = 0.20;
+        WEIGHT_KING_GUARDS = 0.20; 
         WEIGHT_BLACK_NEAR_KING = 0.20; 
     }
     public void protectKingStrategyWeights(){ // main goal: protect king
-        WEIGHT_ALIVE = 0.05;
-        WEIGHT_KILLED = 0.05;
-        WEIGHT_KING_ESCAPE_ROUTES= 0.30;
-        WEIGHT_KING_GUARDS = 0.30;
-        WEIGHT_BLACK_NEAR_KING = 0.30;
+        WEIGHT_ALIVE = 0.25;
+        WEIGHT_KILLED = 0;
+        WEIGHT_KING_ESCAPE_ROUTES= 0.20;
+        WEIGHT_KING_GUARDS = 0.20;
+        WEIGHT_BLACK_NEAR_KING = 0.35;
     }
     public void eatEnemiesStrategyWeights(){ // main goal: kill enemies
-        WEIGHT_ALIVE = 0.10;
-        WEIGHT_KILLED = 0.35;
-        WEIGHT_KING_ESCAPE_ROUTES= 0.25;
+        WEIGHT_ALIVE = 0.30;
+        WEIGHT_KILLED = 0.30;
+        WEIGHT_KING_ESCAPE_ROUTES= 0.20;
         WEIGHT_KING_GUARDS = 0.10;
-        WEIGHT_BLACK_NEAR_KING = 0.20;
+        WEIGHT_BLACK_NEAR_KING = 0.10;
     }
 
 
