@@ -92,17 +92,15 @@ public class BlackHeuristics extends Heuristics {
         int blackNear = blackPawnsNearKing();
 
         // Bonus tattici di quasi-cattura del re, tutti piccoli e compatibili con [0,1]
-        /* vengono mangiate troppe pedine nere proviamo a ridurre questi bonus
-        if (needed == 2 && blackNear == 1) score += 0.10;
-        if (needed == 2 && blackNear == 2) score += 0.25;
+        if (needed == 2 && blackNear == 1) score += 0.05;
+        if (needed == 2 && blackNear == 2) score += 0.10;
 
         if (needed == 3 && blackNear == 1) score += 0.05;
-        if (needed == 3 && blackNear == 2) score += 0.12;
-        if (needed == 3 && blackNear == 3) score += 0.25;
+        if (needed == 3 && blackNear == 2) score += 0.10;
+        if (needed == 3 && blackNear == 3) score += 0.15;
 
-        if (needed == 4 && blackNear == 2) score += 0.06;
-        if (needed == 4 && blackNear == 3) score += 0.15;
-         */
+        if (needed == 4 && blackNear == 2) score += 0.05;
+        if (needed == 4 && blackNear == 3) score += 0.10;
 
         // Re sul trono: leggermente meglio per il nero, perché è meno vicino all'uscita
         if (isKingInCastle()) {
