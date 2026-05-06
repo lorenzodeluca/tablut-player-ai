@@ -198,8 +198,12 @@ public abstract class Heuristics {
      */
 	public boolean isKingNearCastle(){
         int[] king = getKingPosition();
-        boolean leftRight = king[0]==4 && (king[1]==3 || king[1]==5);
-		boolean topBottom = king[1]==4 && (king[0]==3 || king[0]==5);
+		return isNearCastle(king[0],king[1]);
+    }
+
+    public boolean isNearCastle(int y, int x){
+        boolean leftRight = y==4 && (x==3 || x==5);
+		boolean topBottom = x==4 && (y==3 || y==5);
 		return leftRight||topBottom;
     }
 	
@@ -234,6 +238,20 @@ public abstract class Heuristics {
         if(isKingNearCastle())return 3;
         if(isKingCloseToCamp())return 1;
 		return 2;
+    }
+
+    //i want to count how many white pawns are in a position where they could get eaten by just 1 black pawns
+    public double whitePawnsInUnsafePositions(){
+        State.Pawn[][] board = state.getBoard();
+        int counter = 0;
+		for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board.length; j++) {
+                if (board[i][j]==Pawn.WHITE && (isThereACampUnder(i, j)||isThereACampOnTop(i, j)||isThereACampOnTheRight(i, j)||isThereACampOnTheLeft(i, j)||isNearCastle(i,j))) {
+                    counter++;
+                }
+            }
+        }
+        return counter;
     }
 
     // trova il bordo della scacchiera più vicino alla posizione attuale del re
