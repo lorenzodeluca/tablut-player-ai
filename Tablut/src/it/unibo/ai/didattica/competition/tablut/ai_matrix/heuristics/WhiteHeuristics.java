@@ -63,7 +63,7 @@ public class WhiteHeuristics extends Heuristics {
         // ---dynamic weights---
 
         //molte volte perdiamo perchè ci mangiano il re dopo averlo intrappolato... idea: sarebbe bello premiare il mangiare dei pawns vicino al re
-        if(blacksNearKing>0 && ((blacksNearKing+1)*2)>=pawnsToEatKing())protectKingStrategyWeights();
+        if(blacksNearKing>0 && (blacksNearKing+1>=pawnsToEatKing()))protectKingStrategyWeights();
 
         //especially at the beginning of the game maybe its the best to try to minimize the number of enemies
         else if(eatenBlackPawns <= 5) eatEnemiesStrategyWeights();
@@ -85,11 +85,11 @@ public class WhiteHeuristics extends Heuristics {
 
     //3 modalità: chill(resetToDefaultStrategyWeights), difesa(protectKingStrategyWeights), terminator(eatEnemiesStrategyWeights)
     public void resetToDefaultStrategyWeights(){ // main goal: default strategy, the goal is for the king to escape
-        WEIGHT_ALIVE = 0.30; // abbiamo poche pedine... dobbiamo evitare il più possibile di perderle
+        WEIGHT_ALIVE = 0.35; // abbiamo poche pedine... dobbiamo evitare il più possibile di perderle
         WEIGHT_KILLED = 0.15;
         WEIGHT_KING_ESCAPE_ROUTES = 0.20;
         WEIGHT_KING_GUARDS = 0.15; 
-        WEIGHT_BLACK_NEAR_KING = 0.15;
+        WEIGHT_BLACK_NEAR_KING = 0.10;
         WEIGHT_WHITE_PAWNS_IN_SAFE_POSITION = 0.05; 
     }
     public void protectKingStrategyWeights(){ // main goal: protect king
@@ -101,11 +101,11 @@ public class WhiteHeuristics extends Heuristics {
         WEIGHT_WHITE_PAWNS_IN_SAFE_POSITION = 0.05; 
     }
     public void eatEnemiesStrategyWeights(){ // main goal: kill enemies
-        WEIGHT_ALIVE = 0.35;
-        WEIGHT_KILLED = 0.45;
+        WEIGHT_ALIVE = 0.45;
+        WEIGHT_KILLED = 0.30;
         WEIGHT_KING_ESCAPE_ROUTES= 0.05;
         WEIGHT_KING_GUARDS = 0.05;
-        WEIGHT_BLACK_NEAR_KING = 0.05;
+        WEIGHT_BLACK_NEAR_KING = 0.10;
         WEIGHT_WHITE_PAWNS_IN_SAFE_POSITION = 0.05; 
     }
 

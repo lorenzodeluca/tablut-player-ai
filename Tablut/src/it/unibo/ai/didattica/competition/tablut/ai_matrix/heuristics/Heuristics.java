@@ -257,6 +257,7 @@ public abstract class Heuristics {
     }
 
     //i want to count how many white pawns are in a position where they could get eaten by just 1 black pawns
+    //TODO: not consider a position unsafe if there is a friendly pawn in the cell where the enemy should go to capture 
     public double whitePawnsInUnsafePositions(){
         State.Pawn[][] board = state.getBoard();
         int counter = 0;
