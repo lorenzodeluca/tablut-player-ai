@@ -72,7 +72,7 @@ public class BlackHeuristics extends Heuristics {
 
         //---dynamic heuristic
         if(escapesNotProtected && boardCount(Pawn.BLACK)>=12)protectionHeuristic();
-        else if(boardCount(Pawn.WHITE)>6)terminatorHeuristic();
+        else if(boardCount(Pawn.WHITE)>5)terminatorHeuristic();
         else chillHeuristic();
 
         // Parte continua dell'euristica:
@@ -113,48 +113,48 @@ public class BlackHeuristics extends Heuristics {
 //basic weights
 public void chillHeuristic(){ //goal: winning
     //to maximize (sums to 1)
-    WEIGHT_ALIVE = 0.45; // premia il fatto che il nero abbia ancora molte pedine in gioco
-    WEIGHT_KILLED = 0.20; // premia il fatto che il nero abbia già eliminato pedine bianche, quindi il bianco ha meno difese attorno al re
+    WEIGHT_ALIVE = 0.50; // premia il fatto che il nero abbia ancora molte pedine in gioco
+    WEIGHT_KILLED = 0.15; // premia il fatto che il nero abbia già eliminato pedine bianche, quindi il bianco ha meno difese attorno al re
     WEIGHT_BLACK_NEAR_KING = 0.10; // quanta pressione c’è intorno al re di neri
-    WEIGHT_BLACK_ESCAPE_BLOCK = 0; // caselle che spesso servono per preparare il blocco dell’uscita
-    WEIGHT_BLACK_ESCAPE_BLOCK_MOST_IMPORTANT = 0.25; // caselle che spesso servono per preparare il blocco dell’uscita
+    WEIGHT_BLACK_ESCAPE_BLOCK = 0.01; // caselle che spesso servono per preparare il blocco dell’uscita
+    WEIGHT_BLACK_ESCAPE_BLOCK_MOST_IMPORTANT = 0.24; // caselle che spesso servono per preparare il blocco dell’uscita
 
     //to minimize
-    WEIGHT_KING_ESCAPE_ROUTES = 0.15; // peso della vicinanza del re a una casella di fuga sul bordo
-    WEIGHT_OPEN_LINES = 0.05; // quante direzioni dal re verso il bordo sono libere da ostacoli
-    WEIGHT_WHITE_NEAR_KING = 0.05; // quanta pressione/protezione c’è intorno al re di bianchi
-    WEIGHT_KING_MOBILITY = 0.05; // caselle libere vicino al re
-    WEIGHT_WHITE_ESCAPE_SUPPORT = 0.05; // caselle che spesso servono per preparare l’uscita
+    WEIGHT_KING_ESCAPE_ROUTES = 0.16; // peso della vicinanza del re a una casella di fuga sul bordo
+    WEIGHT_OPEN_LINES = 0.20; // quante direzioni dal re verso il bordo sono libere da ostacoli
+    WEIGHT_WHITE_NEAR_KING = 0.06; // quanta pressione/protezione c’è intorno al re di bianchi
+    WEIGHT_KING_MOBILITY = 0.08; // caselle libere vicino al re
+    WEIGHT_WHITE_ESCAPE_SUPPORT = 0.04; // caselle che spesso servono per preparare l’uscita
 }
 public void protectionHeuristic(){ //goal: blocking exits
     //to maximize (sums to 1)
-    WEIGHT_ALIVE = 0.45; // premia il fatto che il nero abbia ancora molte pedine in gioco
+    WEIGHT_ALIVE = 0.50; // premia il fatto che il nero abbia ancora molte pedine in gioco
     WEIGHT_KILLED = 0.10; // premia il fatto che il nero abbia già eliminato pedine bianche, quindi il bianco ha meno difese attorno al re
     WEIGHT_BLACK_NEAR_KING = 0.05; // quanta pressione c’è intorno al re di neri
-    WEIGHT_BLACK_ESCAPE_BLOCK = 0; // caselle che spesso servono per preparare il blocco dell’uscita
-    WEIGHT_BLACK_ESCAPE_BLOCK_MOST_IMPORTANT = 0.40; // caselle che spesso servono per preparare il blocco dell’uscita
+    WEIGHT_BLACK_ESCAPE_BLOCK = 0.01; // caselle che spesso servono per preparare il blocco dell’uscita
+    WEIGHT_BLACK_ESCAPE_BLOCK_MOST_IMPORTANT = 0.34; // caselle che spesso servono per preparare il blocco dell’uscita
 
     //to minimize
-    WEIGHT_KING_ESCAPE_ROUTES = 0.15; // peso della vicinanza del re a una casella di fuga sul bordo
-    WEIGHT_OPEN_LINES = 0.05; // quante direzioni dal re verso il bordo sono libere da ostacoli
-    WEIGHT_WHITE_NEAR_KING = 0.05; // quanta pressione/protezione c’è intorno al re di bianchi
-    WEIGHT_KING_MOBILITY = 0.05; // caselle libere vicino al re
-    WEIGHT_WHITE_ESCAPE_SUPPORT = 0.05; // caselle che spesso servono per preparare l’uscita
+    WEIGHT_KING_ESCAPE_ROUTES = 0.16; // peso della vicinanza del re a una casella di fuga sul bordo
+    WEIGHT_OPEN_LINES = 0.20; // quante direzioni dal re verso il bordo sono libere da ostacoli
+    WEIGHT_WHITE_NEAR_KING = 0.06; // quanta pressione/protezione c’è intorno al re di bianchi
+    WEIGHT_KING_MOBILITY = 0.08; // caselle libere vicino al re
+    WEIGHT_WHITE_ESCAPE_SUPPORT = 0.04; // caselle che spesso servono per preparare l’uscita
 }
 public void terminatorHeuristic(){ //terminator wants blood!
     //to maximize (sums to 1)
     WEIGHT_ALIVE = 0.50; // premia il fatto che il nero abbia ancora molte pedine in gioco
     WEIGHT_KILLED = 0.30; // premia il fatto che il nero abbia già eliminato pedine bianche, quindi il bianco ha meno difese attorno al re
     WEIGHT_BLACK_NEAR_KING = 0.05; // quanta pressione c’è intorno al re di neri
-    WEIGHT_BLACK_ESCAPE_BLOCK = 0; // caselle che spesso servono per preparare il blocco dell’uscita
-    WEIGHT_BLACK_ESCAPE_BLOCK_MOST_IMPORTANT = 0.15; // caselle che spesso servono per preparare il blocco dell’uscita
+    WEIGHT_BLACK_ESCAPE_BLOCK = 0.01; // caselle che spesso servono per preparare il blocco dell’uscita
+    WEIGHT_BLACK_ESCAPE_BLOCK_MOST_IMPORTANT = 0.14; // caselle che spesso servono per preparare il blocco dell’uscita
 
     //to minimize
-    WEIGHT_KING_ESCAPE_ROUTES = 0.15; // peso della vicinanza del re a una casella di fuga sul bordo
-    WEIGHT_OPEN_LINES = 0.05; // quante direzioni dal re verso il bordo sono libere da ostacoli
-    WEIGHT_WHITE_NEAR_KING = 0.05; // quanta pressione/protezione c’è intorno al re di bianchi
-    WEIGHT_KING_MOBILITY = 0.05; // caselle libere vicino al re
-    WEIGHT_WHITE_ESCAPE_SUPPORT = 0.05; // caselle che spesso servono per preparare l’uscita
+    WEIGHT_KING_ESCAPE_ROUTES = 0.16; // peso della vicinanza del re a una casella di fuga sul bordo
+    WEIGHT_OPEN_LINES = 0.20; // quante direzioni dal re verso il bordo sono libere da ostacoli
+    WEIGHT_WHITE_NEAR_KING = 0.06; // quanta pressione/protezione c’è intorno al re di bianchi
+    WEIGHT_KING_MOBILITY = 0.08; // caselle libere vicino al re
+    WEIGHT_WHITE_ESCAPE_SUPPORT = 0.04; // caselle che spesso servono per preparare l’uscita
 }
 
 
