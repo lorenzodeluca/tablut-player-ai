@@ -27,7 +27,9 @@ public class WhiteHeuristics extends Heuristics {
      * ogni valore per la valutazione dello stato deve essere tra 0 e 1
      */
     public double evaluateState() {
-        resetToStockWeights();
+        resetToDefaultStrategyWeights();
+        if (whiteWin()) return Double.POSITIVE_INFINITY;
+        if (blackWin()) return Double.NEGATIVE_INFINITY;
         if (state.getTurn().equals(Turn.DRAW)) return 0.5;
 
         int[] kingPos = getKingPosition();
@@ -54,23 +56,15 @@ public class WhiteHeuristics extends Heuristics {
         double blacksNearKing = blackPawnsNearKing() / 4.0;
 
         
-        // dynamic weights
-        if(eatenBlackPawns <= 5) {
-            WEIGHT_KILLED = 0.30;
-            WEIGHT_KING_ESCAPE_ROUTES = 0.30;
-        } else {
-            WEIGHT_KILLED = 0.15;
-            WEIGHT_KING_ESCAPE_ROUTES = 0.45;
-        }
+        // ---dynamic weights---
 
-        if(blacksNearKing>0 && blacksNearKing*2>=pawnsToEatKing()){
-            //molte volte perdiamo perchè ci mangiano il re dopo averlo intrappolato... sarebbe bello premiare il mangiare dei pawns vicino al re
-            WEIGHT_KING_GUARDS = 0.30;
-            WEIGHT_KING_ESCAPE_ROUTES= 0.30;
-            WEIGHT_BLACK_NEAR_KING = 0.30;
-            WEIGHT_ALIVE = 0.05;
-            WEIGHT_KILLED = 0.05;
-        }
+        //molte volte perdiamo perchè ci mangiano il re dopo averlo intrappolato... idea: sarebbe bello premiare il mangiare dei pawns vicino al re
+        if(blacksNearKing>0 && blacksNearKing*2>=pawnsToEatKing())protectKingStrategyWeights();
+
+        //especially at the beginning of the game maybe its the best to try to minimize the number of enemies
+        else if(eatenBlackPawns <= 5) eatEnemiesStrategyWeights();
+
+        else resetToDefaultStrategyWeights();
 
         // calcolo dei pesi
         double aliveWeighted = WEIGHT_ALIVE * whitePawnsAliveValue;
@@ -84,13 +78,28 @@ public class WhiteHeuristics extends Heuristics {
         return res;
     }
 
-    public void resetToStockWeights(){
+    public void resetToDefaultStrategyWeights(){ // main goal: default strategy, the goal is for the king to escape
         WEIGHT_ALIVE = 0.15;
         WEIGHT_KILLED = 0.10;
         WEIGHT_KING_ESCAPE_ROUTES = 0.45;
         WEIGHT_KING_GUARDS = 0.10; 
         WEIGHT_BLACK_NEAR_KING = 0.20; 
     }
+    public void protectKingStrategyWeights(){ // main goal: protect king
+        WEIGHT_ALIVE = 0.05;
+        WEIGHT_KILLED = 0.05;
+        WEIGHT_KING_ESCAPE_ROUTES= 0.30;
+        WEIGHT_KING_GUARDS = 0.30;
+        WEIGHT_BLACK_NEAR_KING = 0.30;
+    }
+    public void eatEnemiesStrategyWeights(){ // main goal: kill enemies
+        WEIGHT_ALIVE = 0.10;
+        WEIGHT_KILLED = 0.35;
+        WEIGHT_KING_ESCAPE_ROUTES= 0.25;
+        WEIGHT_KING_GUARDS = 0.10;
+        WEIGHT_BLACK_NEAR_KING = 0.20;
+    }
+
 
     /*
      * Questa funzione controlla se ci sono delle vie di fuga ideali libere
