@@ -56,12 +56,12 @@ public class BlackHeuristics extends Heuristics {
         //MODIFICA 
         // il bianco può vincere alla prossima mossa → posizione pessima
         if (whiteCanWinNext()) {
-            return score-=1;
+            score-=1;
         }
 
         // il nero può catturare il re alla prossima mossa → posizione ottima
         if (blackCanCaptureKingNext()) {
-            return score+=1; 
+            score+=1; 
         }
 
         // Se il re può vincere subito, posizione pessima per il nero
