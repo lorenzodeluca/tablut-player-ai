@@ -15,6 +15,7 @@ public abstract class Heuristics {
     public static double WHITE_PAWNS_COUNT = 8;
 	int[][] escapes = {{0,1},{0,2},{0,6},{0,7},{1,0},{2,0},{1,8},{2,8},{0,6},{0,7},{8,6},{8,7},{0,1},{8,1},{8,2},{8,6},{8,7},};
 	int[][] cellsInFrontOfEscapes = {{1,1},{1,2},{1,6},{1,7},{2,1},{2,7},{6,1},{6,7},{7,1},{7,2},{7,6},{7,7}};
+    int[][] bestCellsForBlack = {{1,2},{1,6},{2,1},{2,7},{6,1},{6,7},{7,1},{7,6}}; // optimized version of cellsInFrontOfEscapes
 
     /**
      * Costruisce un oggetto Heuristics associato a uno stato di gioco.

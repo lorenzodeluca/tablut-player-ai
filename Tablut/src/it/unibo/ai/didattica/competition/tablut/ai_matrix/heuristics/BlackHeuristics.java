@@ -9,15 +9,20 @@ public class BlackHeuristics extends Heuristics {
     public static final double BLACK_PAWNS_COUNT = 16.0;
     public static final double WHITE_PAWNS_COUNT = 8.0;
 
-    public static final double WEIGHT_ALIVE = 0.10; // premia il fatto che il nero abbia ancora molte pedine in gioco
-    public static final double WEIGHT_KILLED = 0.12; // premia il fatto che il nero abbia già eliminato pedine bianche, quindi il bianco ha meno difese attorno al re
+    //to maximize
+    public static final double WEIGHT_ALIVE = 0.20; // premia il fatto che il nero abbia ancora molte pedine in gioco
+    public static final double WEIGHT_KILLED = 0.20; // premia il fatto che il nero abbia già eliminato pedine bianche, quindi il bianco ha meno difese attorno al re
+    public static final double WEIGHT_BLACK_NEAR_KING = 0.18; // quanta pressione c’è intorno al re di neri
+    public static final double WEIGHT_BLACK_ESCAPE_BLOCK = 0.06; // caselle che spesso servono per preparare il blocco dell’uscita
+    public static final double WEIGHT_BLACK_ESCAPE_BLOCK_MOST_IMPORTANT = 0.20; // caselle che spesso servono per preparare il blocco dell’uscita
+
+    //to minimize
     public static final double WEIGHT_KING_ESCAPE_ROUTES = 0.16; // peso della vicinanza del re a una casella di fuga sul bordo
     public static final double WEIGHT_OPEN_LINES = 0.20; // quante direzioni dal re verso il bordo sono libere da ostacoli
-    public static final double WEIGHT_BLACK_NEAR_KING = 0.18; // quanta pressione c’è intorno al re di neri
     public static final double WEIGHT_WHITE_NEAR_KING = 0.06; // quanta pressione/protezione c’è intorno al re di bianchi
     public static final double WEIGHT_KING_MOBILITY = 0.08; // caselle libere vicino al re
-    public static final double WEIGHT_BLACK_ESCAPE_BLOCK = 0.06; // caselle che spesso servono per preparare il blocco dell’uscita
     public static final double WEIGHT_WHITE_ESCAPE_SUPPORT = 0.04; // caselle che spesso servono per preparare l’uscita
+
 
     public BlackHeuristics(State state) {
         super(state);
@@ -54,6 +59,7 @@ public class BlackHeuristics extends Heuristics {
         double kingMobility = countFreeNeighbours(kr, kc) / 4.0;
         double blackEscapeBlock = countBlackOnEscapeRing() / 12.0;
         double whiteEscapeSupport = countWhiteOnEscapeRing() / 12.0;
+        double blackMostImportantCellsToBlock = howManyPawnsOnBestCells()/bestCellsForBlack.length;
 
         double score = 0.0;
 
@@ -74,6 +80,7 @@ public class BlackHeuristics extends Heuristics {
         score -= WEIGHT_KING_MOBILITY * kingMobility;
         score += WEIGHT_BLACK_ESCAPE_BLOCK * blackEscapeBlock;
         score -= WEIGHT_WHITE_ESCAPE_SUPPORT * whiteEscapeSupport;
+        score += WEIGHT_BLACK_ESCAPE_BLOCK_MOST_IMPORTANT * blackMostImportantCellsToBlock;
 
         int needed = kingRequiredCapturers();
         int blackNear = blackPawnsNearKing();
@@ -295,7 +302,24 @@ public int kingRequiredCapturers() {
     }
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  countBlackOnEscapeRing  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
 
+public int howManyPawnsOnBestCells() { 
+        // contatore delle pedine nere trovate nelle caselle strategiche
+        int count = 0;
 
+        // scorro tutte le caselle dell'anello già definite nella superclasse Heuristics
+        for (int i = 0; i < bestCellsForBlack.length; i++) {
+            int row = bestCellsForBlack[i][0];
+            int col = bestCellsForBlack[i][1];
+
+            // se nella casella corrente c'è una pedina nera, incremento il contatore
+            if (state.getPawn(row, col) == Pawn.BLACK) {
+                count++;
+            }
+        }
+
+        // restituisco quante pedine nere controllano l'anello delle uscite
+        return count;
+    }
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  countWhiteOnEscapeRing  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
 /**
