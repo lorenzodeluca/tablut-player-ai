@@ -172,6 +172,22 @@ public abstract class Heuristics {
         return isThereACampUnder(king[0], king[1])||isThereACampOnTop(king[0], king[1])||isThereACampOnTheRight(king[0], king[1])||isThereACampOnTheLeft(king[0], king[1]);
     }
 
+    public boolean isCloseToCamp(int y, int x){ //escapes not counted as close
+        return isThereACampUnder(y, x)||isThereACampOnTop(y, x)||isThereACampOnTheRight(y, x)||isThereACampOnTheLeft(y, x);
+    }
+
+    public boolean isAnEscapeCloseToACamp(int y, int x){
+        if(y==2 && (x == 0 || x==8))return true;
+        if(y==6 && (x == 0 || x==8))return true;
+        if(x==2 && (y == 0 || y==8))return true;
+        if(x==6 && (y == 0 || y==8))return true;
+        return false;
+    }
+
+    public boolean isCloseToCampEscapesIncluded(int y, int x){ 
+        return isThereACampUnder(y, x)||isThereACampOnTop(y, x)||isThereACampOnTheRight(y, x)||isThereACampOnTheLeft(y, x)||isAnEscapeCloseToACamp(y,x);
+    }
+
     public boolean twoPawnsKingCapture(){
         int[] king= getKingPosition();
         State.Pawn[][] board = state.getBoard();
@@ -246,7 +262,7 @@ public abstract class Heuristics {
         int counter = 0;
 		for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board.length; j++) {
-                if (board[i][j]==Pawn.WHITE && (isThereACampUnder(i, j)||isThereACampOnTop(i, j)||isThereACampOnTheRight(i, j)||isThereACampOnTheLeft(i, j)||isNearCastle(i,j))) {
+                if (board[i][j]==Pawn.WHITE && (isCloseToCampEscapesIncluded(i,j)||isNearCastle(i,j))) {
                     counter++;
                 }
             }

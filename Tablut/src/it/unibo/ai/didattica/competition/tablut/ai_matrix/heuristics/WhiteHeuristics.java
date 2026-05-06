@@ -16,7 +16,7 @@ public class WhiteHeuristics extends Heuristics {
     public static double WEIGHT_KING_ESCAPE_ROUTES = 0; // peso della distanza del re dalla migliore via di fuga (una tra riga 2, riga 6, colonna 2, colonna 6)
     public static double WEIGHT_KING_GUARDS = 0; // "guardie" (pedine bianche) attorno al re
     public static double WEIGHT_BLACK_NEAR_KING = 0; // pedine nere attorno al re
-    public static double WEIGHT_WHITE_PAWNS_IN_UNSAFE_POSITION = 0; // aggiunta per scoraggiare catture in posizioni non sicure se fossero possibili catture equivalenti in posizioni sicure
+    public static double WEIGHT_WHITE_PAWNS_IN_SAFE_POSITION = 0; // aggiunta per scoraggiare catture in posizioni non sicure se fossero possibili catture equivalenti in posizioni sicure
 
     public WhiteHeuristics(State state) {
         super(state);
@@ -57,6 +57,7 @@ public class WhiteHeuristics extends Heuristics {
 
         //numero di pedine in posizioni non sicure
         double whitePawnsInUnsafePositions = whitePawnsInUnsafePositions()/current_white_pawns;
+        double whitePawnsInSafePositions = 1 - whitePawnsInUnsafePositions;
 
         
         // ---dynamic weights---
@@ -75,9 +76,9 @@ public class WhiteHeuristics extends Heuristics {
         double kingDistanceWeighted = WEIGHT_KING_ESCAPE_ROUTES * escapeValue;
         double kingGuardsWeighted = WEIGHT_KING_GUARDS * guardsNearKing;
         double kingDangerWeighted = WEIGHT_BLACK_NEAR_KING * (1-blacksNearKing);
-        double whitePawnsInUnsafePositionsWeighted = WEIGHT_WHITE_PAWNS_IN_UNSAFE_POSITION * whitePawnsInUnsafePositions;
+        double whitePawnsInUnsafePositionsWeighted = WEIGHT_WHITE_PAWNS_IN_SAFE_POSITION * whitePawnsInSafePositions;
 
-        double res = aliveWeighted + killedWeighted + kingDistanceWeighted + kingGuardsWeighted + kingDangerWeighted;
+        double res = aliveWeighted + killedWeighted + kingDistanceWeighted + kingGuardsWeighted + kingDangerWeighted + whitePawnsInUnsafePositionsWeighted;
 
         return res;
     }
@@ -89,7 +90,7 @@ public class WhiteHeuristics extends Heuristics {
         WEIGHT_KING_ESCAPE_ROUTES = 0.20;
         WEIGHT_KING_GUARDS = 0.15; 
         WEIGHT_BLACK_NEAR_KING = 0.15;
-        WEIGHT_WHITE_PAWNS_IN_UNSAFE_POSITION = 0.05; 
+        WEIGHT_WHITE_PAWNS_IN_SAFE_POSITION = 0.05; 
     }
     public void protectKingStrategyWeights(){ // main goal: protect king
         WEIGHT_ALIVE = 0.30;
@@ -97,7 +98,7 @@ public class WhiteHeuristics extends Heuristics {
         WEIGHT_KING_ESCAPE_ROUTES= 0.20;
         WEIGHT_KING_GUARDS = 0.20;
         WEIGHT_BLACK_NEAR_KING = 0.25;
-        WEIGHT_WHITE_PAWNS_IN_UNSAFE_POSITION = 0.05; 
+        WEIGHT_WHITE_PAWNS_IN_SAFE_POSITION = 0.05; 
     }
     public void eatEnemiesStrategyWeights(){ // main goal: kill enemies
         WEIGHT_ALIVE = 0.35;
@@ -105,7 +106,7 @@ public class WhiteHeuristics extends Heuristics {
         WEIGHT_KING_ESCAPE_ROUTES= 0.05;
         WEIGHT_KING_GUARDS = 0.05;
         WEIGHT_BLACK_NEAR_KING = 0.05;
-        WEIGHT_WHITE_PAWNS_IN_UNSAFE_POSITION = 0.05; 
+        WEIGHT_WHITE_PAWNS_IN_SAFE_POSITION = 0.05; 
     }
 
 
