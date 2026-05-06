@@ -166,6 +166,12 @@ public abstract class Heuristics {
         return false;
     }
 
+    public boolean isKingCloseToCamp(){
+        int[] king= getKingPosition();
+        State.Pawn[][] board = state.getBoard();
+        return isThereACampUnder(king[0], king[1])||isThereACampOnTop(king[0], king[1])||isThereACampOnTheRight(king[0], king[1])||isThereACampOnTheLeft(king[0], king[1]);
+    }
+
     public boolean twoPawnsKingCapture(){
         int[] king= getKingPosition();
         State.Pawn[][] board = state.getBoard();
@@ -226,6 +232,7 @@ public abstract class Heuristics {
     public double pawnsToEatKing(){
         if(isKingInCastle())return 4;
         if(isKingNearCastle())return 3;
+        if(isKingCloseToCamp())return 1;
 		return 2;
     }
 
