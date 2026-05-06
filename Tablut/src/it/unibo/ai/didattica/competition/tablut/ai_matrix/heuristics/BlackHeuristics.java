@@ -33,17 +33,6 @@ public class BlackHeuristics extends Heuristics {
         if (state.getTurn().equals(Turn.BLACKWIN)) return Double.POSITIVE_INFINITY;
         if (state.getTurn().equals(Turn.WHITEWIN)) return Double.NEGATIVE_INFINITY;
         if (state.getTurn().equals(Turn.DRAW)) return 0.5;
-
-        //MODIFICA 
-        // il bianco può vincere alla prossima mossa → posizione pessima
-        if (whiteCanWinNext()) {
-            return -0.9;
-        }
-
-        // il nero può catturare il re alla prossima mossa → posizione ottima
-        if (blackCanCaptureKingNext()) {
-            return +0.9; 
-        }
         
         int[] king = getKingPosition();
         int kr = king[0];
@@ -63,6 +52,17 @@ public class BlackHeuristics extends Heuristics {
         boolean escapesNotProtected = blackMostImportantCellsBlocked != 1;
 
         double score = 0.0;
+
+        //MODIFICA 
+        // il bianco può vincere alla prossima mossa → posizione pessima
+        if (whiteCanWinNext()) {
+            return score-=1;
+        }
+
+        // il nero può catturare il re alla prossima mossa → posizione ottima
+        if (blackCanCaptureKingNext()) {
+            return score+=1; 
+        }
 
         // Se il re può vincere subito, posizione pessima per il nero
         // Uso una penalizzazione piccola ma forte, compatibile con [0,1]
@@ -119,7 +119,7 @@ public void chillHeuristic(){ //goal: winning
     WEIGHT_KILLED = 0.20; // premia il fatto che il nero abbia già eliminato pedine bianche, quindi il bianco ha meno difese attorno al re
     WEIGHT_BLACK_NEAR_KING = 0.10; // quanta pressione c’è intorno al re di neri
     WEIGHT_BLACK_ESCAPE_BLOCK = 0; // caselle che spesso servono per preparare il blocco dell’uscita
-    WEIGHT_BLACK_ESCAPE_BLOCK_MOST_IMPORTANT = 0.24; // caselle che spesso servono per preparare il blocco dell’uscita
+    WEIGHT_BLACK_ESCAPE_BLOCK_MOST_IMPORTANT = 0.25; // caselle che spesso servono per preparare il blocco dell’uscita
 
     //to minimize
     WEIGHT_KING_ESCAPE_ROUTES = 0.15; // peso della vicinanza del re a una casella di fuga sul bordo
@@ -130,8 +130,8 @@ public void chillHeuristic(){ //goal: winning
 }
 public void protectionHeuristic(){ //goal: blocking exits
     //to maximize (sums to 1)
-    WEIGHT_ALIVE = 0.50; // premia il fatto che il nero abbia ancora molte pedine in gioco
-    WEIGHT_KILLED = 0.05; // premia il fatto che il nero abbia già eliminato pedine bianche, quindi il bianco ha meno difese attorno al re
+    WEIGHT_ALIVE = 0.45; // premia il fatto che il nero abbia ancora molte pedine in gioco
+    WEIGHT_KILLED = 0.10; // premia il fatto che il nero abbia già eliminato pedine bianche, quindi il bianco ha meno difese attorno al re
     WEIGHT_BLACK_NEAR_KING = 0.05; // quanta pressione c’è intorno al re di neri
     WEIGHT_BLACK_ESCAPE_BLOCK = 0; // caselle che spesso servono per preparare il blocco dell’uscita
     WEIGHT_BLACK_ESCAPE_BLOCK_MOST_IMPORTANT = 0.40; // caselle che spesso servono per preparare il blocco dell’uscita
