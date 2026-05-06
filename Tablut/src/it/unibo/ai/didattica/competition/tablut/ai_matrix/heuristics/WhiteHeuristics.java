@@ -66,7 +66,7 @@ public class WhiteHeuristics extends Heuristics {
         if(blacksNearKing>0 && (blacksNearKing+1>=pawnsToEatKing()))protectKingStrategyWeights();
 
         //especially at the beginning of the game maybe its the best to try to minimize the number of enemies
-        else if(whitePawnsAliveValue>4 && eatenBlackPawns <= 5) eatEnemiesStrategyWeights();
+        else if(eatenBlackPawns <= 5) eatEnemiesStrategyWeights();
 
         else resetToDefaultStrategyWeights();
 
