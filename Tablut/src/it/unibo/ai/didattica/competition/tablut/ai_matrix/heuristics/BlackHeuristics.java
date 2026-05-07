@@ -54,7 +54,7 @@ public class BlackHeuristics extends Heuristics {
         double score = 0.0;
 
         //MODIFICA 
-        // il bianco può vincere alla prossima mossa → posizione pessima
+        //il bianco può vincere alla prossima mossa → posizione pessima
         if (whiteCanWinNext()) {
             score-=1;
         }
@@ -71,9 +71,10 @@ public class BlackHeuristics extends Heuristics {
         }
 
         //---dynamic heuristic
-        if(escapesNotProtected && boardCount(Pawn.BLACK)>=12)protectionHeuristic();
-        else if(boardCount(Pawn.WHITE)>5)terminatorHeuristic();
-        else chillHeuristic();
+        basicHeuristic();
+        //if(escapesNotProtected && boardCount(Pawn.BLACK)>=12)protectionHeuristic();
+        //else if(boardCount(Pawn.WHITE)>5)terminatorHeuristic();
+        //else chillHeuristic();
 
         // Parte continua dell'euristica:
         // premio ciò che favorisce il nero e penalizzo ciò che favorisce il bianco
@@ -92,15 +93,19 @@ public class BlackHeuristics extends Heuristics {
         int blackNear = blackPawnsNearKing();
 
         // Bonus tattici di quasi-cattura del re, tutti piccoli e compatibili con [0,1]
-        if (needed == 2 && blackNear == 1) score += 0.05;
-        if (needed == 2 && blackNear == 2) score += 0.10;
+        //le pedine nere sono un po' troppo suicide... bisognerebbe non dare questi bonus se gli altri lati del re sono bloccati
+        if(countFreeNeighbours(kr, kc)+blackNear>=needed){
+            if (needed == 2 && blackNear == 1) score += 0.02;
+            if (needed == 2 && blackNear == 2) score += 0.04;
 
-        if (needed == 3 && blackNear == 1) score += 0.05;
-        if (needed == 3 && blackNear == 2) score += 0.10;
-        if (needed == 3 && blackNear == 3) score += 0.15;
+            if (needed == 3 && blackNear == 1) score += 0.02;
+            if (needed == 3 && blackNear == 2) score += 0.04;
+            if (needed == 3 && blackNear == 3) score += 0.06;
 
-        if (needed == 4 && blackNear == 2) score += 0.05;
-        if (needed == 4 && blackNear == 3) score += 0.10;
+            if (needed == 4 && blackNear == 2) score += 0.02;
+            if (needed == 4 && blackNear == 3) score += 0.04;
+        }
+        
 
         // Re sul trono: leggermente meglio per il nero, perché è meno vicino all'uscita
         if (isKingInCastle()) {
@@ -111,9 +116,25 @@ public class BlackHeuristics extends Heuristics {
     }
 
 //basic weights
+public void basicHeuristic(){ //goal: winning
+    //to maximize
+    WEIGHT_ALIVE = 0.20; // premia il fatto che il nero abbia ancora molte pedine in gioco
+    WEIGHT_KILLED = 0.20; // premia il fatto che il nero abbia già eliminato pedine bianche, quindi il bianco ha meno difese attorno al re
+    WEIGHT_BLACK_NEAR_KING = 0.18; // quanta pressione c’è intorno al re di neri
+    WEIGHT_BLACK_ESCAPE_BLOCK = 0.06; // caselle che spesso servono per preparare il blocco dell’uscita
+    WEIGHT_BLACK_ESCAPE_BLOCK_MOST_IMPORTANT = 0.20; // caselle che spesso servono per preparare il blocco dell’uscita
+
+    //to minimize
+    WEIGHT_KING_ESCAPE_ROUTES = 0.16; // peso della vicinanza del re a una casella di fuga sul bordo
+    WEIGHT_OPEN_LINES = 0.20; // quante direzioni dal re verso il bordo sono libere da ostacoli
+    WEIGHT_WHITE_NEAR_KING = 0.06; // quanta pressione/protezione c’è intorno al re di bianchi
+    WEIGHT_KING_MOBILITY = 0.08; // caselle libere vicino al re
+    WEIGHT_WHITE_ESCAPE_SUPPORT = 0.04; // caselle che spesso servono per preparare l’uscita
+}
+
 public void chillHeuristic(){ //goal: winning
-    //to maximize (sums to 1)
-    WEIGHT_ALIVE = 0.50; // premia il fatto che il nero abbia ancora molte pedine in gioco
+    //to maximize
+    WEIGHT_ALIVE = 2; // premia il fatto che il nero abbia ancora molte pedine in gioco
     WEIGHT_KILLED = 0.15; // premia il fatto che il nero abbia già eliminato pedine bianche, quindi il bianco ha meno difese attorno al re
     WEIGHT_BLACK_NEAR_KING = 0.10; // quanta pressione c’è intorno al re di neri
     WEIGHT_BLACK_ESCAPE_BLOCK = 0.01; // caselle che spesso servono per preparare il blocco dell’uscita
@@ -123,27 +144,27 @@ public void chillHeuristic(){ //goal: winning
     WEIGHT_KING_ESCAPE_ROUTES = 0.16; // peso della vicinanza del re a una casella di fuga sul bordo
     WEIGHT_OPEN_LINES = 0.20; // quante direzioni dal re verso il bordo sono libere da ostacoli
     WEIGHT_WHITE_NEAR_KING = 0.06; // quanta pressione/protezione c’è intorno al re di bianchi
-    WEIGHT_KING_MOBILITY = 0.08; // caselle libere vicino al re
+    WEIGHT_KING_MOBILITY = 0.15; // caselle libere vicino al re
     WEIGHT_WHITE_ESCAPE_SUPPORT = 0.04; // caselle che spesso servono per preparare l’uscita
 }
 public void protectionHeuristic(){ //goal: blocking exits
-    //to maximize (sums to 1)
-    WEIGHT_ALIVE = 0.50; // premia il fatto che il nero abbia ancora molte pedine in gioco
-    WEIGHT_KILLED = 0.10; // premia il fatto che il nero abbia già eliminato pedine bianche, quindi il bianco ha meno difese attorno al re
+    //to maximize
+    WEIGHT_ALIVE = 2; // premia il fatto che il nero abbia ancora molte pedine in gioco
+    WEIGHT_KILLED = 0.05; // premia il fatto che il nero abbia già eliminato pedine bianche, quindi il bianco ha meno difese attorno al re
     WEIGHT_BLACK_NEAR_KING = 0.05; // quanta pressione c’è intorno al re di neri
     WEIGHT_BLACK_ESCAPE_BLOCK = 0.01; // caselle che spesso servono per preparare il blocco dell’uscita
-    WEIGHT_BLACK_ESCAPE_BLOCK_MOST_IMPORTANT = 0.34; // caselle che spesso servono per preparare il blocco dell’uscita
+    WEIGHT_BLACK_ESCAPE_BLOCK_MOST_IMPORTANT = 0.39; // caselle che spesso servono per preparare il blocco dell’uscita
 
     //to minimize
     WEIGHT_KING_ESCAPE_ROUTES = 0.16; // peso della vicinanza del re a una casella di fuga sul bordo
-    WEIGHT_OPEN_LINES = 0.20; // quante direzioni dal re verso il bordo sono libere da ostacoli
+    WEIGHT_OPEN_LINES = 0.05; // quante direzioni dal re verso il bordo sono libere da ostacoli
     WEIGHT_WHITE_NEAR_KING = 0.06; // quanta pressione/protezione c’è intorno al re di bianchi
-    WEIGHT_KING_MOBILITY = 0.08; // caselle libere vicino al re
+    WEIGHT_KING_MOBILITY = 0.05; // caselle libere vicino al re
     WEIGHT_WHITE_ESCAPE_SUPPORT = 0.04; // caselle che spesso servono per preparare l’uscita
 }
 public void terminatorHeuristic(){ //terminator wants blood!
-    //to maximize (sums to 1)
-    WEIGHT_ALIVE = 0.50; // premia il fatto che il nero abbia ancora molte pedine in gioco
+    //to maximize
+    WEIGHT_ALIVE = 2; // premia il fatto che il nero abbia ancora molte pedine in gioco
     WEIGHT_KILLED = 0.30; // premia il fatto che il nero abbia già eliminato pedine bianche, quindi il bianco ha meno difese attorno al re
     WEIGHT_BLACK_NEAR_KING = 0.05; // quanta pressione c’è intorno al re di neri
     WEIGHT_BLACK_ESCAPE_BLOCK = 0.01; // caselle che spesso servono per preparare il blocco dell’uscita
@@ -153,7 +174,7 @@ public void terminatorHeuristic(){ //terminator wants blood!
     WEIGHT_KING_ESCAPE_ROUTES = 0.16; // peso della vicinanza del re a una casella di fuga sul bordo
     WEIGHT_OPEN_LINES = 0.20; // quante direzioni dal re verso il bordo sono libere da ostacoli
     WEIGHT_WHITE_NEAR_KING = 0.06; // quanta pressione/protezione c’è intorno al re di bianchi
-    WEIGHT_KING_MOBILITY = 0.08; // caselle libere vicino al re
+    WEIGHT_KING_MOBILITY = 0.15; // caselle libere vicino al re
     WEIGHT_WHITE_ESCAPE_SUPPORT = 0.04; // caselle che spesso servono per preparare l’uscita
 }
 
