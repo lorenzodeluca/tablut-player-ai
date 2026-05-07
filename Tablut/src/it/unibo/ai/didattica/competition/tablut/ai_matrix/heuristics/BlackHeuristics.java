@@ -134,7 +134,7 @@ public void basicHeuristic(){ //goal: winning
 
 public void chillHeuristic(){ //goal: winning
     //to maximize
-    WEIGHT_ALIVE = 2; // premia il fatto che il nero abbia ancora molte pedine in gioco
+    WEIGHT_ALIVE = 0.50; // premia il fatto che il nero abbia ancora molte pedine in gioco
     WEIGHT_KILLED = 0.15; // premia il fatto che il nero abbia già eliminato pedine bianche, quindi il bianco ha meno difese attorno al re
     WEIGHT_BLACK_NEAR_KING = 0.10; // quanta pressione c’è intorno al re di neri
     WEIGHT_BLACK_ESCAPE_BLOCK = 0.01; // caselle che spesso servono per preparare il blocco dell’uscita
@@ -149,7 +149,7 @@ public void chillHeuristic(){ //goal: winning
 }
 public void protectionHeuristic(){ //goal: blocking exits
     //to maximize
-    WEIGHT_ALIVE = 2; // premia il fatto che il nero abbia ancora molte pedine in gioco
+    WEIGHT_ALIVE = 0.50; // premia il fatto che il nero abbia ancora molte pedine in gioco
     WEIGHT_KILLED = 0.05; // premia il fatto che il nero abbia già eliminato pedine bianche, quindi il bianco ha meno difese attorno al re
     WEIGHT_BLACK_NEAR_KING = 0.05; // quanta pressione c’è intorno al re di neri
     WEIGHT_BLACK_ESCAPE_BLOCK = 0.01; // caselle che spesso servono per preparare il blocco dell’uscita
@@ -164,7 +164,7 @@ public void protectionHeuristic(){ //goal: blocking exits
 }
 public void terminatorHeuristic(){ //terminator wants blood!
     //to maximize
-    WEIGHT_ALIVE = 2; // premia il fatto che il nero abbia ancora molte pedine in gioco
+    WEIGHT_ALIVE = 0.50; // premia il fatto che il nero abbia ancora molte pedine in gioco
     WEIGHT_KILLED = 0.30; // premia il fatto che il nero abbia già eliminato pedine bianche, quindi il bianco ha meno difese attorno al re
     WEIGHT_BLACK_NEAR_KING = 0.05; // quanta pressione c’è intorno al re di neri
     WEIGHT_BLACK_ESCAPE_BLOCK = 0.01; // caselle che spesso servono per preparare il blocco dell’uscita
