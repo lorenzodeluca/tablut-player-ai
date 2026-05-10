@@ -91,7 +91,7 @@
     <target name="matrix-jar">
         <jar destfile="matrix.jar" filesetmanifest="mergewithoutmain">
             <manifest>
-                <attribute name="Main-Class" value="it.unibo.ai.didattica.competition.tablut.ai_matrix.TablutMatrixClient"/>
+                <attribute name="Main-Class" value="it.unibo.ai.didattica.competition.tablut.ai_matrix.client.TablutMatrixClient"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
             <fileset dir="build"/>
@@ -114,7 +114,7 @@
     </target>
 
     <target name="MatrixClient">
-        <java classname="it.unibo.ai.didattica.competition.tablut.ai_matrix.TablutMatrixClient" fork="true">
+        <java classname="it.unibo.ai.didattica.competition.tablut.ai_matrix.client.TablutMatrixClient" fork="true">
             <classpath>
                 <pathelement location="lib/aima-core.jar" />
                 <pathelement location="lib/gson-2.2.2.jar"/>
