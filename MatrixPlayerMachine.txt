@@ -9,5 +9,8 @@ https://liveunibo-my.sharepoint.com/:f:/g/personal/lorenzo_deluca10_studio_unibo
 link a repository git: 
 https://github.com/lorenzodeluca/tablut-player-ai
 
-cmd to run the player inside the machine: 
+comando per eseguire il player: 
 bash /home/tablut/tablut/runmyplayer.sh {WHITE/BLACK} {timeout} {ip}
+
+note: 
+- non eseguire più di un player in contemporanea dentro la macchina... perchè ogni player si riserva della ram e quindi eseguendone due in contemporanea uno dei due crasha. 
