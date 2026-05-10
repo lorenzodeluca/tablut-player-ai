@@ -1,0 +1,13 @@
+Matrix Tablut Player version 1.0
+
+link macchina formato ova: 
+https://liveunibo-my.sharepoint.com/:u:/g/personal/lorenzo_deluca10_studio_unibo_it/IQAsoyMEyyWnTqv_-7E0LUOjAZoLxAjaXp-EmbY0bBQv9oI?e=NFDncS
+
+link cartella contenente macchina:
+https://liveunibo-my.sharepoint.com/:f:/g/personal/lorenzo_deluca10_studio_unibo_it/IgBFd7oJroYhRIubjsJl7Mg-AeUV5yTwutTAGCxBH-qv_9s?e=DSHEHo
+
+link a repository git: 
+https://github.com/lorenzodeluca/tablut-player-ai
+
+cmd to run the player inside the machine: 
+bash /home/tablut/tablut/runmyplayer.sh {WHITE/BLACK} {timeout} {ip}
