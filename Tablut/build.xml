@@ -101,6 +101,18 @@
         </jar>
 	</target>
 
+    <target name="run-matrix-optimized">
+        <java jar="matrix.jar" fork="true">
+            <jvmarg value="-Xms6g"/>
+            <jvmarg value="-Xmx6g"/>
+            <jvmarg value="-XX:+UseG1GC"/>
+            <jvmarg value="-XX:ParallelGCThreads=4"/>
+            <jvmarg value="-XX:ConcGCThreads=1"/>
+            <jvmarg value="-server"/>
+            <jvmarg value="-XX:+TieredCompilation"/>
+        </java>
+    </target>
+
     <target name="MatrixClient">
         <java classname="it.unibo.ai.didattica.competition.tablut.ai_matrix.TablutMatrixClient" fork="true">
             <classpath>
