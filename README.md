@@ -6,7 +6,7 @@ This project was developed for the **Tablut Competition 2025/26** as part of the
 
 
 
-Our team reached the **final round** of the competition, successfully implementing a highly optimized, parallelized AI agent.
+Our team reached the **final round** of the competition, successfully implementing a highly optimized, parallelized AI agent and winning against the other teams.
 
 
 
